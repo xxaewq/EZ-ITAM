@@ -474,6 +474,107 @@ namespace EzItam.Api.Data.Migrations
                     b.ToTable("Employees", (string)null);
                 });
 
+            modelBuilder.Entity("EzItam.Api.Models.Entities.Inventory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("DateFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("DateTo")
+                        .HasColumnType("date");
+
+                    b.Property<int>("InventoryStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Inventories", (string)null);
+                });
+
+            modelBuilder.Entity("EzItam.Api.Models.Entities.InventoryDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetStatusIV")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdAsset")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdEmployee")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdEmployeeIV")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdLocation")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdLocationIV")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InventoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ScanCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdAsset");
+
+                    b.HasIndex("IdEmployee");
+
+                    b.HasIndex("IdEmployeeIV");
+
+                    b.HasIndex("IdLocation");
+
+                    b.HasIndex("IdLocationIV");
+
+                    b.HasIndex("InventoryId", "IdAsset")
+                        .IsUnique();
+
+                    b.HasIndex("InventoryId", "ScanCount");
+
+                    b.ToTable("InventoryDetails", (string)null);
+                });
+
             modelBuilder.Entity("EzItam.Api.Models.Entities.LicenseAssignment", b =>
                 {
                     b.Property<int>("Id")
@@ -969,6 +1070,57 @@ namespace EzItam.Api.Data.Migrations
                     b.Navigation("Department");
                 });
 
+            modelBuilder.Entity("EzItam.Api.Models.Entities.InventoryDetail", b =>
+                {
+                    b.HasOne("EzItam.Api.Models.Entities.Asset", "Asset")
+                        .WithMany("InventoryDetails")
+                        .HasForeignKey("IdAsset")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EzItam.Api.Models.Entities.Employee", "Employee")
+                        .WithMany("InventoryDetails")
+                        .HasForeignKey("IdEmployee")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EzItam.Api.Models.Entities.Employee", "EmployeeIV")
+                        .WithMany("InventoryDetailsIV")
+                        .HasForeignKey("IdEmployeeIV")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EzItam.Api.Models.Entities.Location", "Location")
+                        .WithMany("InventoryDetails")
+                        .HasForeignKey("IdLocation")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EzItam.Api.Models.Entities.Location", "LocationIV")
+                        .WithMany("InventoryDetailsIV")
+                        .HasForeignKey("IdLocationIV")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EzItam.Api.Models.Entities.Inventory", "Inventory")
+                        .WithMany("InventoryDetails")
+                        .HasForeignKey("InventoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("EmployeeIV");
+
+                    b.Navigation("Inventory");
+
+                    b.Navigation("Location");
+
+                    b.Navigation("LocationIV");
+                });
+
             modelBuilder.Entity("EzItam.Api.Models.Entities.LicenseAssignment", b =>
                 {
                     b.HasOne("EzItam.Api.Models.Entities.Asset", "Asset")
@@ -1084,6 +1236,8 @@ namespace EzItam.Api.Data.Migrations
 
                     b.Navigation("Assignments");
 
+                    b.Navigation("InventoryDetails");
+
                     b.Navigation("LicenseAssignments");
 
                     b.Navigation("MaintenanceRecords");
@@ -1105,12 +1259,25 @@ namespace EzItam.Api.Data.Migrations
 
                     b.Navigation("Assignments");
 
+                    b.Navigation("InventoryDetails");
+
+                    b.Navigation("InventoryDetailsIV");
+
                     b.Navigation("LicenseAssignments");
+                });
+
+            modelBuilder.Entity("EzItam.Api.Models.Entities.Inventory", b =>
+                {
+                    b.Navigation("InventoryDetails");
                 });
 
             modelBuilder.Entity("EzItam.Api.Models.Entities.Location", b =>
                 {
                     b.Navigation("Assets");
+
+                    b.Navigation("InventoryDetails");
+
+                    b.Navigation("InventoryDetailsIV");
                 });
 
             modelBuilder.Entity("EzItam.Api.Models.Entities.SoftwareLicense", b =>

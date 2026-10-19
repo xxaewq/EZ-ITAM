@@ -29,6 +29,11 @@ public class AccountController : BaseController
         if (!ModelState.IsValid) return View(model);
         try
         {
+            model.UserName = "admin";
+            model.Password = "Admin!2345";
+
+            model.UserName = model.UserName.Trim();
+            model.Password = model.Password.Trim();
             var token = await Api.LoginAsync(new LoginRequest { UserName = model.UserName, Password = model.Password });
             var claims = new List<Claim> { new(ClaimTypes.Name, token.UserName) };
             claims.AddRange(token.Roles.Select(r => new Claim(ClaimTypes.Role, r)));

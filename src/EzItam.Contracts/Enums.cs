@@ -50,3 +50,11 @@ public enum AgentRing
     Stable = 0,
     Pilot = 1
 }
+
+public enum InventoryStatus
+{
+    Open = 1,
+    InProgress = 2,
+    Completed = 3,
+    Closed = 4
+}

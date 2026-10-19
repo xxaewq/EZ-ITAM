@@ -381,3 +381,75 @@ public class AssetLabelsDto
     [JsonPropertyName("ip_address")]
     public string? IpAddress { get; set; }
 }
+
+public class InventoryDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public DateOnly DateFrom { get; set; }
+    public DateOnly DateTo { get; set; }
+    public string? Notes { get; set; }
+    public InventoryStatus InventoryStatus { get; set; }
+    public int TotalAssetsCount { get; set; }
+    public int ScannedAssetsCount { get; set; }
+}
+
+public class CreateInventoryDto
+{
+    public string Name { get; set; } = string.Empty;
+    public DateOnly DateFrom { get; set; }
+    public DateOnly DateTo { get; set; }
+    public string? Notes { get; set; }
+    public string? CreatedBy { get; set; }
+}
+
+public class UpdateInventoryDto
+{
+    public string Name { get; set; } = string.Empty;
+    public DateOnly DateFrom { get; set; }
+    public DateOnly DateTo { get; set; }
+    public string? Notes { get; set; }
+    public InventoryStatus InventoryStatus { get; set; }
+}
+
+public class InventoryDetailDto
+{
+    public int Id { get; set; }
+    public int IdAsset { get; set; }
+    public string? AssetName { get; set; }
+    public int IdLocation { get; set; }
+    public string? LocationName { get; set; }
+    public int IdEmployee { get; set; }
+    public string? EmployeeName { get; set; }
+    public int IdLocationIV { get; set; }
+    public string? LocationIVName { get; set; }
+    public int IdEmployeeIV { get; set; }
+    public string? EmployeeIVName { get; set; }
+    public int ScanCount { get; set; }
+    public string? Notes { get; set; }
+    public string? UpdatedBy { get; set; }
+    public DateTime UpdatedTime { get; set; }
+}
+
+public class InventoryDetailResponseDto : InventoryDto
+{
+    public List<InventoryDetailDto> Details { get; set; } = [];
+}
+
+public class ScanAssetDto
+{
+    public int InventoryId { get; set; }
+    public int IdAsset { get; set; }
+    public int IdLocationIV { get; set; }
+    public int IdEmployeeIV { get; set; }
+    public AssetStatus AssetStatusIV { get; set; }
+    public string? Notes { get; set; }
+    public string UpdatedBy { get; set; } = string.Empty;
+}
+
+public class ScanResultDto
+{
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public int ScanCount { get; set; }
+}

@@ -36,6 +36,8 @@ public class Employee
     public ICollection<Asset> Assets { get; set; } = new List<Asset>();
     public ICollection<AssetAssignment> Assignments { get; set; } = new List<AssetAssignment>();
     public ICollection<LicenseAssignment> LicenseAssignments { get; set; } = new List<LicenseAssignment>();
+    public ICollection<InventoryDetail> InventoryDetails { get; set; } = [];
+    public ICollection<InventoryDetail> InventoryDetailsIV { get; set; } = [];
 
     public string DisplayName => $"{Name} ({EmployeeNo})";
 }

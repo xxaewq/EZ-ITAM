@@ -27,6 +27,9 @@ public class Location
     public bool IsActive { get; set; } = true;
 
     public ICollection<Asset> Assets { get; set; } = new List<Asset>();
+    // Các collection cho nhân viên gốc và nhân viên kiểm kê (IV)
+    public ICollection<InventoryDetail> InventoryDetails { get; set; } = [];
+    public ICollection<InventoryDetail> InventoryDetailsIV { get; set; } = [];
 
     public string FullName => string.Join(" ", new[] { Building, Floor, Room, Name }.Where(s => !string.IsNullOrWhiteSpace(s)));
 }

@@ -78,8 +78,12 @@ builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<ILicenseService, LicenseService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+
 builder.Services.AddSingleton<IUpdateCatalog>(_ => new UpdateCatalog(
     builder.Configuration["Updates:Root"] is { Length: > 0 } root ? root : Path.Combine(builder.Environment.ContentRootPath, "updates")));
+
+
 
 builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilter>())
     .AddJsonOptions(o => o.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never);

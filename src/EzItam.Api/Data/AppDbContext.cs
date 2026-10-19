@@ -31,6 +31,9 @@ public class AppDbContext : IdentityDbContext
     public DbSet<Agent> Agents => Set<Agent>();
     public DbSet<AgentSoftware> AgentSoftware => Set<AgentSoftware>();
 
+    public DbSet<Inventory> Inventories => Set<Inventory>();
+    public DbSet<InventoryDetail> InventoryDetails => Set<InventoryDetail>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -124,6 +127,38 @@ public class AppDbContext : IdentityDbContext
             e.HasIndex(a => new { a.EntityName, a.EntityKey });
             e.HasIndex(a => a.Timestamp);
         });
+
+        builder.Entity<Inventory>(e =>
+        {
+            e.ToTable("Inventories");
+            e.Property(i => i.Name).IsRequired().HasMaxLength(50);
+            e.Property(i => i.InventoryStatus).IsRequired().HasConversion<int>();
+            e.HasIndex(i => i.Name).IsUnique();
+            e.Property(i => i.DateFrom).IsRequired();
+            e.Property(i => i.DateTo).IsRequired();
+            e.Property(i => i.Notes).IsRequired(false).HasMaxLength(200);
+        });
+
+        builder.Entity<InventoryDetail>(e =>
+        {
+            e.ToTable("InventoryDetails");
+            e.HasOne(d => d.Inventory).WithMany(i => i.InventoryDetails).HasForeignKey(d => d.InventoryId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(d => d.Asset).WithMany(a => a.InventoryDetails).HasForeignKey(d => d.IdAsset).OnDelete(DeleteBehavior.Cascade);
+            e.Property(d => d.IdLocation).IsRequired(false);
+            e.HasOne(d => d.Location).WithMany(l => l.InventoryDetails).HasForeignKey(d => d.IdLocation).OnDelete(DeleteBehavior.Restrict);
+            e.Property(d => d.IdEmployee).IsRequired(false);
+            e.HasOne(d => d.Employee).WithMany(emp => emp.InventoryDetails).HasForeignKey(d => d.IdEmployee).OnDelete(DeleteBehavior.Restrict);
+            e.Property(d => d.IdLocationIV).IsRequired(false);
+            e.HasOne(d => d.LocationIV).WithMany(l => l.InventoryDetailsIV).HasForeignKey(d => d.IdLocationIV).OnDelete(DeleteBehavior.Restrict);
+            e.Property(d => d.IdEmployeeIV).IsRequired(false);
+            e.HasOne(d => d.EmployeeIV).WithMany(emp => emp.InventoryDetailsIV).HasForeignKey(d => d.IdEmployeeIV).OnDelete(DeleteBehavior.Restrict);
+            e.Property(d => d.Notes).IsRequired(false).HasMaxLength(200);
+            e.Property(d => d.ScanCount).IsRequired().HasDefaultValue(0);
+            e.HasIndex(d => new { d.InventoryId, d.IdAsset }).IsUnique();
+            e.HasIndex(d => new { d.InventoryId, d.ScanCount });
+        });
+
+
     }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)

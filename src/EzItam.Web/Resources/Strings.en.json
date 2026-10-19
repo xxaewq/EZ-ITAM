@@ -483,5 +483,11 @@
   "보유 수량": "Owned seats",
   "라이선스 유형": "License type",
   "제조사명": "Publisher",
-  "버전 ": "Version "
+  "버전 ": "Version ",
+
+
+  "inv.title": "Inventories",
+  "inv.create": "+ Create",
+  "inv.update": "Update",
+  "inv.genbook": "Generate book"
 }
