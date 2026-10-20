@@ -152,9 +152,16 @@ public sealed class ItamApiClient
     // ---------- 대시보드 ----------
     public Task<DashboardDto> DashboardAsync() => Send<DashboardDto>(HttpMethod.Get, "api/v1/dashboard");
 
-    public Task<List<AssetLabelViewModel>> ListAssetLabelAsync(string ids)
+    public async Task<List<AssetLabelViewModel>> ListAssetLabelAsync(string ids)
     {
         var fromQuery = Query("api/v1/assets/labels", new { ids });
-        return Send<List<AssetLabelViewModel>>(HttpMethod.Get, fromQuery);
+        return await Send<List<AssetLabelViewModel>>(HttpMethod.Get, fromQuery);
     }
+
+    public async Task<List<InventoryDto>> ListInventoryAsync() => await Send<List<InventoryDto>>(HttpMethod.Get, "api/v1/inventories");
+    public async Task<InventoryDto> GetInventoryByIdAsync(int id) => await Send<InventoryDto>(HttpMethod.Get, $"api/v1/inventories/{id}");
+    public async Task<bool> CreateInventoryAsync(InventoryDto dto) => await Send<bool>(HttpMethod.Post, "api/v1/inventories", dto);
+    public async Task<bool> UpdateInventoryAsync(int id, InventoryDto dto) => await Send<bool>(HttpMethod.Put, $"api/v1/inventories/{id}", dto);
+    public async Task<bool> DeleteInventoryAsync(int id) => await Send<bool>(HttpMethod.Delete, $"api/v1/inventories/{id}");
+    public async Task<bool> GenInventoryBookAsync(int id) => await Send<bool>(HttpMethod.Post, $"api/v1/inventories/{id}/genbook");
 }

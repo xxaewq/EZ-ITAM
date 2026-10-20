@@ -522,16 +522,16 @@ namespace EzItam.Api.Data.Migrations
                     b.Property<int>("IdAsset")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdEmployee")
+                    b.Property<int?>("IdEmployee")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdEmployeeIV")
+                    b.Property<int?>("IdEmployeeIV")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdLocation")
+                    b.Property<int?>("IdLocation")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdLocationIV")
+                    b.Property<int?>("IdLocationIV")
                         .HasColumnType("int");
 
                     b.Property<int>("InventoryId")
@@ -1081,26 +1081,22 @@ namespace EzItam.Api.Data.Migrations
                     b.HasOne("EzItam.Api.Models.Entities.Employee", "Employee")
                         .WithMany("InventoryDetails")
                         .HasForeignKey("IdEmployee")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("EzItam.Api.Models.Entities.Employee", "EmployeeIV")
                         .WithMany("InventoryDetailsIV")
                         .HasForeignKey("IdEmployeeIV")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("EzItam.Api.Models.Entities.Location", "Location")
                         .WithMany("InventoryDetails")
                         .HasForeignKey("IdLocation")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("EzItam.Api.Models.Entities.Location", "LocationIV")
                         .WithMany("InventoryDetailsIV")
                         .HasForeignKey("IdLocationIV")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("EzItam.Api.Models.Entities.Inventory", "Inventory")
                         .WithMany("InventoryDetails")

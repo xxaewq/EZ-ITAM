@@ -6,6 +6,7 @@
   "nav.agents": "PC 에이전트",
   "nav.licenses": "소프트웨어 라이선스",
   "nav.maintenance": "유지보수",
+  "nav.inventory": "목록",
   "nav.section.assets": "자산",
   "nav.section.org": "조직",
   "nav.section.master": "기준정보",
@@ -72,5 +73,24 @@
   "common.cancel": "취소",
   "common.delete": "삭제",
   "common.edit": "수정",
-  "common.create": "등록"
+  "common.create": "등록",
+
+  "inv.title": "자산 목록",
+  "inv.btn.create": "+ 만들다",
+  "inv.btn.update": "업데이트",
+  "inv.btn.genbook": "재고 장부 생성",
+  "inv.btn.submit": "제출하다",
+  "inv.btn.cancel": "취소",
+  "inv.table.name": "재고 이름",
+  "inv.table.date": "재고 날짜",
+  "inv.table.status": "재고 현황",
+  "inv.table.scanned": "스캔됨 / 전체",
+  "inv.table.action": "행동",
+  "inv.table.note": "메모",
+  "inv.create.successfully": "성공적으로 생성됨.",
+  "inv.create.fail": "생성 실패.",
+  "inv.update.successfully": "업데이트가 완료되었습니다.",
+  "inv.update.fail": "업데이트 실패.",
+  "inv.delete.successfully": "삭제가 완료되었습니다.",
+  "inv.delete.fail": "삭제 실패."
 }

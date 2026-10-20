@@ -6,7 +6,7 @@ namespace EzItam.Api.Controllers
 
     [ApiController]
     [Route("api/v1/inventories")]
-    public class InventoriesController(IInventoryService inventoryService) : ControllerBase
+    public class InventoryController(IInventoryService inventoryService) : ControllerBase
     {
         private readonly IInventoryService _inventoryService = inventoryService;
 
@@ -30,7 +30,7 @@ namespace EzItam.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = "CanEdit")]
-        public async Task<ActionResult<InventoryDetailResponseDto>> CreateInventory(CreateInventoryDto dto)
+        public async Task<ActionResult<int>> CreateInventory(CreateInventoryDto dto)
         {
             var createdInventory = await _inventoryService.CreateInventoryAsync(dto);
             return Ok(createdInventory);
@@ -45,7 +45,19 @@ namespace EzItam.Api.Controllers
             {
                 return NotFound();
             }
-            return Ok();
+            return Ok(updated);
+        }
+
+        [HttpDelete("{id:int}")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<ActionResult> DeleteInventory(int id)
+        {
+            var deleted = await _inventoryService.DeleteInventoryAsync(id);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+            return Ok(deleted);
         }
 
         [HttpPut("{id:int}/close")]
@@ -59,5 +71,14 @@ namespace EzItam.Api.Controllers
             }
             return Ok();
         }
+
+        [HttpPost("{id:int}/genbook")]
+        [Authorize(Policy = "CanEdit")]
+        public async Task<ActionResult<int>> GenInventoryBook(int id)
+        {
+            var res = await _inventoryService.GenInventoryBookAsync(id);
+            return Ok(res);
+        }
+
     }
 }

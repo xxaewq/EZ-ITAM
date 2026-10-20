@@ -6,6 +6,7 @@
   "nav.agents": "PC agents",
   "nav.licenses": "Software licenses",
   "nav.maintenance": "Maintenance",
+  "nav.inventory": "Inventory",
   "nav.section.assets": "Assets",
   "nav.section.org": "Organization",
   "nav.section.master": "Master data",
@@ -486,8 +487,24 @@
   "버전 ": "Version ",
 
 
-  "inv.title": "Inventories",
-  "inv.create": "+ Create",
-  "inv.update": "Update",
-  "inv.genbook": "Generate book"
+  "inv.title": "Inventory",
+  "inv.title.add": "Add Inventory",
+  "inv.title.update": "Update Inventory",
+  "inv.btn.create": "+ Create",
+  "inv.btn.update": "Update",
+  "inv.btn.genbook": "Gen inventory book",
+  "inv.btn.submit": "Submit",
+  "inv.btn.cancel": "Cancel",
+  "inv.table.name": "Inventory name",
+  "inv.table.date": "Inventory date",
+  "inv.table.status": "Inventory status",
+  "inv.table.scanned": "Scanned / All",
+  "inv.table.action": "Action",
+  "inv.table.note": "Note",
+  "inv.create.successfully": "Create successfully.",
+  "inv.create.fail": "Create fail.",
+  "inv.update.successfully": "Update successfully.",
+  "inv.update.fail": "Update fail.",
+  "inv.delete.successfully": "Delete successfully.",
+  "inv.delete.fail": "Delete fail."
 }

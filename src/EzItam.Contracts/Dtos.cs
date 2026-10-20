@@ -382,16 +382,40 @@ public class AssetLabelsDto
     public string? IpAddress { get; set; }
 }
 
-public class InventoryDto
+public class InventoryDto : IValidatableObject
 {
     public int Id { get; set; }
+    [Required(ErrorMessage = "Inventory Name field is required.")]
     public string Name { get; set; } = string.Empty;
-    public DateOnly DateFrom { get; set; }
-    public DateOnly DateTo { get; set; }
+    [Required]
+    public DateOnly DateFrom { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+    [Required]
+    public DateOnly DateTo { get; set; } = DateOnly.FromDateTime(DateTime.Now);
     public string? Notes { get; set; }
     public InventoryStatus InventoryStatus { get; set; }
     public int TotalAssetsCount { get; set; }
     public int ScannedAssetsCount { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+
+        if (DateTo < today)
+        {
+            yield return new ValidationResult(
+                "The inventory end date must be greater than today's date.",
+                [nameof(DateTo)]
+            );
+        }
+
+        if (DateTo < DateFrom)
+        {
+            yield return new ValidationResult(
+                "The inventory end date must be greater than or equal to the start date.",
+                [nameof(DateTo), nameof(DateFrom)]
+            );
+        }
+    }
 }
 
 public class CreateInventoryDto

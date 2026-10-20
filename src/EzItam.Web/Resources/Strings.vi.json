@@ -6,6 +6,7 @@
   "nav.agents": "Tác tử PC",
   "nav.licenses": "Giấy phép phần mềm",
   "nav.maintenance": "Bảo trì",
+  "nav.inventory": "Kiểm kê",
   "nav.section.assets": "Tài sản",
   "nav.section.org": "Tổ chức",
   "nav.section.master": "Dữ liệu danh mục",
@@ -483,5 +484,24 @@
   "보유 수량": "Số suất sở hữu",
   "라이선스 유형": "Loại giấy phép",
   "제조사명": "Nhà phát hành",
-  "버전 ": "Phiên bản "
+  "버전 ": "Phiên bản ",
+
+  "inv.title": "Kiểm kê thiết bị",
+  "inv.btn.create": "+ Tạo mới",
+  "inv.btn.update": "Cập nhật",
+  "inv.btn.genbook": "Lập sổ kiểm kê",
+  "inv.btn.submit": "Xác nhận",
+  "inv.btn.cancel": "Hủy",
+  "inv.table.name": "Tên kỳ kiểm kê",
+  "inv.table.date": "Thời gian kiểm kê",
+  "inv.table.status": "Trạng thái",
+  "inv.table.scanned": "Đã kiểm kê/Tất cả",
+  "inv.table.action": "Hành động",
+  "inv.table.note": "Ghi chú",
+  "inv.create.successfully": "Tạo mới thành công.",
+  "inv.create.fail": "Tạo mới thất bại.",
+  "inv.update.successfully": "Cập nhật thành công.",
+  "inv.update.fail": "Cập nhật thất bại.",
+  "inv.delete.successfully": "Xóa thành công.",
+  "inv.delete.fail": "Xóa thất bại."
 }

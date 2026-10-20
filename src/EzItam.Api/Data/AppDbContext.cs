@@ -188,7 +188,8 @@ public class AppDbContext : IdentityDbContext
     private static readonly HashSet<string> AuditedEntities = new()
     {
         nameof(Asset), nameof(AssetCategory), nameof(Location), nameof(Department), nameof(Employee),
-        nameof(Vendor), nameof(AssetAssignment), nameof(MaintenanceRecord), nameof(SoftwareLicense), nameof(LicenseAssignment)
+        nameof(Vendor), nameof(AssetAssignment), nameof(MaintenanceRecord), nameof(SoftwareLicense), nameof(LicenseAssignment),
+        nameof(Inventory), nameof(InventoryDetail)
     };
 
     /// <summary>

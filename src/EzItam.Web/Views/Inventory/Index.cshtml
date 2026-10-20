@@ -1,0 +1,55 @@
+﻿@model List<InventoryDto>
+@{
+	ViewData["Title"] = L["inv.title"];
+	var canEdit = User.IsInRole("Admin") || User.IsInRole("Manager");
+	var isAdmin = User.IsInRole("Admin");
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h1 class="h4 mb-0">@L["inv.title"]</h1>
+	@if (canEdit)
+	{
+		<a class="btn btn-primary btn-sm" asp-action="Create">@L["inv.btn.create"]</a>
+	}
+</div>
+<div class="card">
+	<table class="table table-sm table-hover mb-0">
+		<thead class="table-light">
+			<tr>
+				<th>@L["inv.table.name"]</th>
+				<th>@L["inv.table.date"]</th>
+				<th>@L["inv.table.status"]</th>
+				<th>@L["inv.table.scanned"]</th>
+				<th>@L["inv.table.note"]</th>
+				<th>@L["inv.table.action"]</th>
+			</tr>
+		</thead>
+		<tbody>
+			@if (Model is not null)
+			{
+				@foreach (var l in Model)
+				{
+					<tr class="">
+						<td>@l.Name</td>
+						<td>@l.DateFrom.ToString("dd/MM/yyyy") - @l.DateTo.ToString("dd/MM/yyyy")</td>
+						<td>@l.InventoryStatus</td>
+						<td>@l.ScannedAssetsCount / @l.TotalAssetsCount</td>
+						<td>@l.Notes</td>
+						<td>
+							@if (canEdit)
+							{
+								<a class="btn btn-sm btn-outline-secondary @(l.InventoryStatus != InventoryStatus.Closed ? "enabled" : "disabled")" asp-action="Edit" asp-route-id="@l.Id">@L["inv.btn.update"]</a>
+								<a class="btn btn-sm btn-outline-success @(l.InventoryStatus == InventoryStatus.Open ? "enabled" : "disabled")" asp-action="Genbook" asp-route-id="@l.Id">@L["inv.btn.genbook"]</a>
+								
+								@if (isAdmin && l.InventoryStatus == InventoryStatus.Open)
+								{
+									<partial name="_ConfirmDelete" model="@(("Inventory", (object)l.Id, l.Name))" />
+								}
+							}
+						</td>
+					</tr>
+				}
+			}
+			
+		</tbody>
+	</table>
+</div>

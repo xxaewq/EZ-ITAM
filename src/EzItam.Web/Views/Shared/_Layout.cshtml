@@ -1,81 +1,82 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@(ViewData["Title"] is null ? "" : ViewData["Title"] + " - ")EZ-ITAM</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@(ViewData["Title"] is null ? "" : ViewData["Title"] + " - ")EZ-ITAM</title>
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body data-busy-text="@L["처리 중..."].Value">
-@{
-    var isAuthenticated = User.Identity?.IsAuthenticated == true;
-    var canEdit = User.IsInRole("Admin") || User.IsInRole("Manager");
-    var isAdmin = User.IsInRole("Admin");
-    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
-    string Active(params string[] names) => names.Contains(controller) ? "active" : "";
-}
-@if (isAuthenticated)
-{
-<div class="app-shell">
-    <nav class="sidebar d-flex flex-column">
-        <a class="brand" asp-controller="Home" asp-action="Index">
-            <span class="brand-mark">EZ</span><span class="brand-text">ITAM</span>
-        </a>
-        <ul class="nav flex-column">
-            <li class="nav-section">@L["nav.section.assets"]</li>
-            <li><a class="nav-link @Active("Home")" asp-controller="Home" asp-action="Index">@L["nav.dashboard"]</a></li>
-            <li><a class="nav-link @Active("Assets")" asp-controller="Assets" asp-action="Index">@L["nav.assets"]</a></li>
-            <li><a class="nav-link @Active("Agents")" asp-controller="Agents" asp-action="Index">@L["nav.agents"]</a></li>
-            <li><a class="nav-link @Active("Licenses")" asp-controller="Licenses" asp-action="Index">@L["nav.licenses"]</a></li>
-            <li><a class="nav-link @Active("Maintenance")" asp-controller="Maintenance" asp-action="Index">@L["nav.maintenance"]</a></li>
-            <li class="nav-section">@L["nav.section.org"]</li>
-            <li><a class="nav-link @Active("Employees")" asp-controller="Employees" asp-action="Index">@L["nav.employees"]</a></li>
-            <li><a class="nav-link @Active("Departments")" asp-controller="Departments" asp-action="Index">@L["nav.departments"]</a></li>
-            <li class="nav-section">@L["nav.section.master"]</li>
-            <li><a class="nav-link @Active("Categories")" asp-controller="Categories" asp-action="Index">@L["nav.categories"]</a></li>
-            <li><a class="nav-link @Active("Locations")" asp-controller="Locations" asp-action="Index">@L["nav.locations"]</a></li>
-            <li><a class="nav-link @Active("Vendors")" asp-controller="Vendors" asp-action="Index">@L["nav.vendors"]</a></li>
-            <li class="nav-section">@L["nav.section.system"]</li>
-            <li><a class="nav-link @Active("Audit")" asp-controller="Audit" asp-action="Index">@L["nav.audit"]</a></li>
-            @if (isAdmin)
-            {
-                <li><a class="nav-link @Active("Users")" asp-controller="Users" asp-action="Index">@L["nav.users"]</a></li>
-            }
-        </ul>
-        <div class="mt-auto sidebar-footer">
-            <div class="small text-truncate">@User.Identity!.Name</div>
-            <div class="small text-muted">@(isAdmin ? L["role.admin"] : canEdit ? L["role.manager"] : L["role.viewer"])</div>
-            <div class="d-flex gap-1 mt-2 small">
-                <a class="text-white-50" href="/Home/SetLanguage?culture=ko-KR&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">@L["한국어"]</a> ·
-                <a class="text-white-50" href="/Home/SetLanguage?culture=en-US&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">English</a> ·
-                <a class="text-white-50" href="/Home/SetLanguage?culture=vi-VN&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Tiếng Việt</a>
-            </div>
-            <div class="d-flex gap-2 mt-2">
-                <a class="btn btn-sm btn-outline-light" asp-controller="Account" asp-action="ChangePassword">@L["nav.password"]</a>
-                <form asp-controller="Account" asp-action="Logout" method="post">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-sm btn-outline-light">@L["nav.logout"]</button>
-                </form>
-            </div>
-        </div>
-    </nav>
-    <main class="content">
-        <partial name="_Alerts" />
-        @RenderBody()
-    </main>
-</div>
-}
-else
-{
-    <main class="container py-5">
-        <partial name="_Alerts" />
-        @RenderBody()
-    </main>
-}
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-@await RenderSectionAsync("Scripts", required: false)
+	@{
+		var isAuthenticated = User.Identity?.IsAuthenticated == true;
+		var canEdit = User.IsInRole("Admin") || User.IsInRole("Manager");
+		var isAdmin = User.IsInRole("Admin");
+		var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+		string Active(params string[] names) => names.Contains(controller) ? "active" : "";
+	}
+	@if (isAuthenticated)
+	{
+		<div class="app-shell">
+			<nav class="sidebar d-flex flex-column">
+				<a class="brand" asp-controller="Home" asp-action="Index">
+					<span class="brand-mark">EZ</span><span class="brand-text">ITAM</span>
+				</a>
+				<ul class="nav flex-column">
+					<li class="nav-section">@L["nav.section.assets"]</li>
+					<li><a class="nav-link @Active("Home")" asp-controller="Home" asp-action="Index">@L["nav.dashboard"]</a></li>
+					<li><a class="nav-link @Active("Assets")" asp-controller="Assets" asp-action="Index">@L["nav.assets"]</a></li>
+					<li><a class="nav-link @Active("Agents")" asp-controller="Agents" asp-action="Index">@L["nav.agents"]</a></li>
+					<li><a class="nav-link @Active("Licenses")" asp-controller="Licenses" asp-action="Index">@L["nav.licenses"]</a></li>
+					<li><a class="nav-link @Active("Maintenance")" asp-controller="Maintenance" asp-action="Index">@L["nav.maintenance"]</a></li>
+					<li><a class="nav-link @Active("Inventory")" asp-controller="Inventory" asp-action="Index">@L["nav.inventory"]</a></li>
+					<li class="nav-section">@L["nav.section.org"]</li>
+					<li><a class="nav-link @Active("Employees")" asp-controller="Employees" asp-action="Index">@L["nav.employees"]</a></li>
+					<li><a class="nav-link @Active("Departments")" asp-controller="Departments" asp-action="Index">@L["nav.departments"]</a></li>
+					<li class="nav-section">@L["nav.section.master"]</li>
+					<li><a class="nav-link @Active("Categories")" asp-controller="Categories" asp-action="Index">@L["nav.categories"]</a></li>
+					<li><a class="nav-link @Active("Locations")" asp-controller="Locations" asp-action="Index">@L["nav.locations"]</a></li>
+					<li><a class="nav-link @Active("Vendors")" asp-controller="Vendors" asp-action="Index">@L["nav.vendors"]</a></li>
+					<li class="nav-section">@L["nav.section.system"]</li>
+					<li><a class="nav-link @Active("Audit")" asp-controller="Audit" asp-action="Index">@L["nav.audit"]</a></li>
+					@if (isAdmin)
+					{
+						<li><a class="nav-link @Active("Users")" asp-controller="Users" asp-action="Index">@L["nav.users"]</a></li>
+					}
+				</ul>
+				<div class="mt-auto sidebar-footer">
+					<div class="small text-truncate">@User.Identity!.Name</div>
+					<div class="small text-muted">@(isAdmin ? L["role.admin"] : canEdit ? L["role.manager"] : L["role.viewer"])</div>
+					<div class="d-flex gap-1 mt-2 small">
+						<a class="text-white-50" href="/Home/SetLanguage?culture=ko-KR&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">@L["한국어"]</a> ·
+						<a class="text-white-50" href="/Home/SetLanguage?culture=en-US&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">English</a> ·
+						<a class="text-white-50" href="/Home/SetLanguage?culture=vi-VN&returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)">Tiếng Việt</a>
+					</div>
+					<div class="d-flex gap-2 mt-2">
+						<a class="btn btn-sm btn-outline-light" asp-controller="Account" asp-action="ChangePassword">@L["nav.password"]</a>
+						<form asp-controller="Account" asp-action="Logout" method="post">
+							@Html.AntiForgeryToken()
+							<button type="submit" class="btn btn-sm btn-outline-light">@L["nav.logout"]</button>
+						</form>
+					</div>
+				</div>
+			</nav>
+			<main class="content">
+				<partial name="_Alerts" />
+				@RenderBody()
+			</main>
+		</div>
+	}
+	else
+	{
+		<main class="container py-5">
+			<partial name="_Alerts" />
+			@RenderBody()
+		</main>
+	}
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
