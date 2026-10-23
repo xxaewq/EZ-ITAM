@@ -29,7 +29,7 @@
 				@foreach (var l in Model)
 				{
 					<tr class="">
-						<td>@l.Name</td>
+						<td><a asp-action="Details" asp-route-id="@l.Id">@l.Name</a></td>
 						<td>@l.DateFrom.ToString("dd/MM/yyyy") - @l.DateTo.ToString("dd/MM/yyyy")</td>
 						<td>@l.InventoryStatus</td>
 						<td>@l.ScannedAssetsCount / @l.TotalAssetsCount</td>

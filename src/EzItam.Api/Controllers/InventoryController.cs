@@ -18,7 +18,7 @@ namespace EzItam.Api.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<InventoryDetailResponseDto>> GetInventoryById(int id)
+        public async Task<ActionResult<InventoryDto>> GetInventoryById(int id)
         {
             var inventory = await _inventoryService.GetInventoryByIdAsync(id);
             if (inventory is null)
@@ -80,5 +80,12 @@ namespace EzItam.Api.Controllers
             return Ok(res);
         }
 
+
+        [HttpGet("{id:int}/details")]
+        public async Task<ActionResult<InventoryDetailResponseDto?>> GetInventoryDetailByInventoryId(int id)
+        {
+            var res = await _inventoryService.GetInventoryDetailByInventoryIdAsync(id);
+            return Ok(res);
+        }
     }
 }

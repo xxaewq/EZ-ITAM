@@ -1,5 +1,257 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model InventoryDetailResponseDto
 @{
+    ViewData["Title"] = L["invdetail.title"];
+    
+    // Tính toán nhanh số liệu cho các bảng tổng hợp
+    var totalAssets = Model.Details.Count;
+    var scannedAssets = Model.Details.Count(d => d.ScanCount > 0);
+    var unscannedAssets = totalAssets - scannedAssets;
+    
+    // Thiết bị có sự thay đổi thông tin (Lệch vị trí IV so với gốc, hoặc lệch nhân viên, hoặc lệch trạng thái)
+    var changedAssets = Model.Details.Where(d => d.ScanCount > 0 && (d.IdLocation != d.IdLocationIV || d.IdEmployee != d.IdEmployeeIV || d.Status != d.StatusIV)).ToList();
+
+    // Gom nhóm theo phân loại (Category) để làm bảng tổng hợp số lượng scan
+    var categoryStats = Model.Details
+        .GroupBy(d => d.CategoryName)
+        .Select(g => new
+        {
+            CategoryName = g.Key,
+            Total = g.Count(),
+            Scanned = g.Count(x => x.ScanCount > 0),
+            Unscanned = g.Count(x => x.ScanCount == 0)
+        }).ToList();
+}
+
+<!-- 1. HEADER & THÔNG TIN CHUNG -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a asp-action="Index">@L["invdetail.back"]</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-success btn-sm" asp-action="Scan" asp-route-id="@Model.Id">
+            <i class="bi bi-file-earmark-excel"></i> @L["inv.btn.scan"]
+        </a>
+
+        <a class="btn btn-outline-secondary btn-sm" asp-action="Export" asp-route-id="@Model.Id">
+            <i class="bi bi-file-earmark-excel"></i> @L["inv.btn.export"]
+        </a>
+    </div>
+</div>
+
+<!-- 2. THẺ THỐNG KÊ NHANH (METRIC CARDS) -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-primary text-white">
+            <div class="card-body">
+                <h6 class="card-title text-white-50">@L["invdetail.totalassets"]</h6>
+                <h3 class="mb-0 fw-bold">@totalAssets.ToString("#,##0")</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-success text-white">
+            <div class="card-body">
+                <h6 class="card-title text-white-50">@L["invdetail.scanned"]</h6>
+                <h3 class="mb-0 fw-bold">@scannedAssets.ToString("#,##0") <span class="fs-6 fw-normal">(@(totalAssets > 0 ? (scannedAssets * 100 / totalAssets) : 0)%)</span></h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-secondary text-white">
+            <div class="card-body">
+                <h6 class="card-title text-white-50">@L["invdetail.unscanned"]</h6>
+                <h3 class="mb-0 fw-bold">@unscannedAssets.ToString("#,##0")</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-warning text-dark">
+            <div class="card-body">
+                <h6 class="card-title text-dark-50">@L["invdetail.changed"]</h6>
+                <h3 class="mb-0 fw-bold">@changedAssets.Count.ToString("#,##0")</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. KHU VỰC 2 BẢNG NHỎ TỔNG HỢP (PHÂN LOẠI & THAY ĐỔI) -->
+<div class="row g-3 mb-4">
+    <!-- Bảng nhỏ 1: Tổng hợp số lượng đã scan theo phân loại -->
+    <div class="col-lg-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-light py-2">
+                <h6 class="mb-0 fw-bold">📊 @L["invdetail.categoryreport"]</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0 align-middle">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>@L["invdetail.category"]</th>
+                            <th class="text-center">@L["invdetail.totalassets"]</th>
+                            <th class="text-center">@L["invdetail.scanned"]</th>
+                            <th class="text-center">@L["invdetail.progress"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var stat in categoryStats)
+                        {
+                            var percent = stat.Total > 0 ? (stat.Scanned * 100 / stat.Total) : 0;
+                            <tr>
+                                <td><strong>@stat.CategoryName</strong></td>
+                                <td class="text-center">@stat.Total</td>
+                                <td class="text-center"><span class="badge bg-success">@stat.Scanned</span></td>
+                                <td style="width: 30%;">
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: @percent%" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small class="text-muted">@percent%</small>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng nhỏ 2: Tổng hợp những thiết bị đã bị thay đổi thông tin -->
+    <div class="col-lg-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-warning text-dark">⚠️ @L["invdetail.changereport"]</h6>
+                <span class="badge bg-warning text-dark">@changedAssets.Count thiết bị</span>
+            </div>
+            <div class="table-responsive" style="max-height: 220px; overflow-y: auto;">
+                <table class="table table-sm table-hover mb-0 align-middle small" id="changedItemsTable" style="width:100%">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th>@L["invdetail.table.asset"]</th>
+                            <th>@L["invdetail.table.location"]</th>
+                            <th>@L["invdetail.table.assetstatus"]</th>
+                            <th>@L["invdetail.table.employee"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int cIndex = 0;
+                        }
+                        @foreach (var item in changedAssets)
+                        {
+                            <tr class="changed-row" data-index="@(cIndex++)" style="@(cIndex > 5 ? "display:none;" : "")">
+                                <td><strong>@item.AssetTag | @item.AssetName</strong></td>
+                                <td>
+                                    @if (item.IdLocation != item.IdLocationIV)
+                                    {
+                                        <span class="text-muted">@item.LocationName</span> <text>➔</text> <strong class="text-danger">@item.LocationIVName</strong>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Status != item.StatusIV)
+                                    {
+                                        <span class="text-muted">@item.Status</span> <text>➔</text> <strong class="text-danger">@item.StatusIV</strong>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.IdEmployee != item.IdEmployeeIV)
+                                    {
+                                        <span class="text-muted">@item.EmployeeName</span> <text>➔</text> <strong class="text-danger">@item.EmployeeIVName</strong>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. BẢNG CHÍNH: CHỨA THÔNG TIN TẤT CẢ THIẾT BỊ TRONG ĐỢT KIỂM KÊ -->
+<div class="card shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+        <h5 class="mb-0 fs-6 fw-bold">📋 @L["invdetail.detailreport"]</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0 align-middle" id="inventoryTable" style="width:100%">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>@L["invdetail.table.asset"]</th>
+                    <th>@L["invdetail.table.category"]</th>
+                    <th>@L["invdetail.table.location"]</th>
+                    <th>@L["invdetail.table.locationiv"]</th>
+                    <th>@L["invdetail.table.assetstatus"]</th>
+                    <th>@L["invdetail.table.assetstatusiv"]</th>
+                    <th>@L["invdetail.table.employee"]</th>
+                    <th>@L["invdetail.table.employeeiv"]</th>
+                    <th class="text-center">@L["invdetail.table.scanstatus"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int index = 1;
+                }
+                @foreach (var item in Model.Details)
+                {
+                    bool isChanged = item.ScanCount > 0 && (item.IdLocation != item.IdLocationIV || item.IdEmployee != item.IdEmployeeIV);
+                    string rowClass = item.ScanCount == 0 ? "table-light text-muted" : (isChanged ? "table-warning" : "");
+
+                    <tr class="@rowClass">
+                        <td>@(index++)</td>
+                        <td><strong>@item.AssetTag | @item.AssetName</strong></td>
+                        <td>@(item.CategoryName ?? "-")</td>
+                        <td>@(item.LocationName ?? "-")</td>
+                        <td>@(item.LocationIVName ?? "-")</td>
+                        <td>@(item.Status)</td>
+                        <td>@(item.StatusIV)</td>
+                        <td>@(item.EmployeeName ?? "-")</td>
+                        <td>@(item.EmployeeIVName ?? "-")</td>
+                        <td class="text-center">
+                            @if (item.ScanCount > 0)
+                            {
+                                <span class="badge bg-success">@L["invdetail.scanned"]</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@L["invdetail.unscanned"]</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $('#inventoryTable').DataTable({
+            });
+
+            $('#changedItemsTable').DataTable({
+            });
+        });
+    </script>
 }

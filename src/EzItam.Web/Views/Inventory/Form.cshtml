@@ -5,8 +5,13 @@
 <partial name="_PageHeader" model="@(ViewData["Title"]!.ToString())" />
 <div class="card" style="max-width:560px">
 	<div class="card-body">
-		<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? null : Model.Id)" method="@(isNew ? "post" : "put")">
+		<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? null : Model.Id)" method="post">
 			<input type="hidden" asp-for="Id" />
+			@if (!isNew)
+			{
+				<input type="hidden" asp-for="InventoryStatus" />
+			}
+			
 			<div asp-validation-summary="All" class="text-danger  py-2"></div>
 			<div class="mb-1">
 				<label class="form-label">Inventory name</label>
@@ -17,15 +22,19 @@
 			</div>
 			
 			<div class="row mb-1">
-				<div class="col-4 mb-3">
+				<div class="col-4 mb-1">
 					<input asp-for="DateFrom" type="date" class="form-control" />
 				</div>
 				<div class="col-2 text-center mb-3">
 					<span>-</span>
 				</div>
-				<div class="col-4 mb-3">
+				<div class="col-4 mb-1">
 					<input asp-for="DateTo" type="date" class="form-control" />
 				</div>
+			</div>
+			<div class="mb-1">
+				<label class="form-label" asp-for="Notes"></label>
+				<textarea asp-for="Name" class="form-control"></textarea>
 			</div>
 			<button type="submit" class="btn btn-primary">@L["inv.btn.submit"]</button>
 			<a class="btn btn-outline-secondary" asp-action="Index">@L["inv.btn.cancel"]</a>

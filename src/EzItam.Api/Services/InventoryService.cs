@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace EzItam.Api.Services
@@ -7,13 +8,14 @@ namespace EzItam.Api.Services
     {
         // --- Quản lý đợt kiểm kê (Inventory Management) ---
         Task<IEnumerable<InventoryDto>> GetAllInventoriesAsync();
-        Task<InventoryDetailResponseDto?> GetInventoryByIdAsync(int inventoryId);
+        Task<InventoryDto?> GetInventoryByIdAsync(int inventoryId);
         Task<bool> CreateInventoryAsync(CreateInventoryDto dto);
         Task<bool> UpdateInventoryAsync(int id, UpdateInventoryDto dto);
         Task<bool> CloseInventoryAsync(int id); // Đóng/Hoàn thành đợt kiểm kê
         Task<bool> GenInventoryBookAsync(int id);
         Task<bool> DeleteInventoryAsync(int id);
         Task<bool> IsAnyNotCloseInvetoryAsync();
+        Task<InventoryDetailResponseDto?> GetInventoryDetailByInventoryIdAsync(int id);
     }
 
 
@@ -161,7 +163,7 @@ namespace EzItam.Api.Services
             return await inventories.ToListAsync();
         }
 
-        public async Task<InventoryDetailResponseDto?> GetInventoryByIdAsync(int inventoryId)
+        public async Task<InventoryDto?> GetInventoryByIdAsync(int inventoryId)
         {
             var inventory = await _context.Inventories.FindAsync(inventoryId);
             if (inventory is null)
@@ -169,7 +171,7 @@ namespace EzItam.Api.Services
                 return null;
             }
 
-            return new InventoryDetailResponseDto
+            return new InventoryDto
             {
                 Id = inventory.Id,
                 Name = inventory.Name,
@@ -202,6 +204,68 @@ namespace EzItam.Api.Services
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<InventoryDetailResponseDto?> GetInventoryDetailByInventoryIdAsync(int id)
+        {
+            // 1. Lấy thông tin chung của đợt kiểm kê (Inventory)
+            var inventory = await _context.Inventories
+                .AsNoTracking()
+                .Where(i => i.Id == id)
+                .Select(i => new InventoryDetailResponseDto
+                {
+                    Id = i.Id,
+                    Name = i.Name,
+                    DateFrom = i.DateFrom,
+                    DateTo = i.DateTo,
+                    Notes = i.Notes,
+                    InventoryStatus = i.InventoryStatus
+                })
+                .FirstOrDefaultAsync();
+
+            if (inventory == null)
+            {
+                return null;
+            }
+
+            // 2. Lấy danh sách chi tiết thiết bị kiểm kê và kết hợp các bảng liên quan
+            inventory.Details = await _context.InventoryDetails
+                .AsNoTracking()
+                .Where(d => d.InventoryId == id)
+                .Select(d => new InventoryDetailDto
+                {
+                    Id = d.Id,
+                    IdAsset = d.IdAsset,
+                    // Lấy AssetTag và AssetName từ bảng Asset thông qua quan hệ IdAsset
+                    AssetTag = d.Asset != null ? d.Asset.AssetTag : null,       // Thay đổi tên thuộc tính 'Tag' nếu model Asset của bạn đặt khác (vd: AssetTag)
+                    AssetName = d.Asset != null ? d.Asset.Name : null,
+                    // Lấy CategoryName thông qua quan hệ từ Asset sang Category
+                    CategoryName = d.Asset != null && d.Asset.Category != null ? d.Asset.Category.Name : null,
+
+                    IdLocation = d.IdLocation ?? 0,
+                    LocationName = d.Location != null ? d.Location.Name : null,
+
+                    IdEmployee = d.IdEmployee ?? 0,
+                    EmployeeName = d.Employee != null ? d.Employee.Name : null,
+
+                    Status = d.Status,
+
+                    IdLocationIV = d.IdLocationIV ?? 0,
+                    LocationIVName = d.LocationIV != null ? d.LocationIV.Name : null,
+
+                    IdEmployeeIV = d.IdEmployeeIV ?? 0,
+                    EmployeeIVName = d.EmployeeIV != null ? d.EmployeeIV.Name : null,
+
+                    StatusIV = d.AssetStatusIV,
+
+                    ScanCount = d.ScanCount,
+                    Notes = d.Notes,
+                    UpdatedBy = d.UpdatedBy,
+                    UpdatedTime = d.UpdatedTime
+                })
+                .ToListAsync();
+
+            return inventory;
         }
     }
 }

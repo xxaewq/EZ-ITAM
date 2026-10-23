@@ -164,4 +164,5 @@ public sealed class ItamApiClient
     public async Task<bool> UpdateInventoryAsync(int id, InventoryDto dto) => await Send<bool>(HttpMethod.Put, $"api/v1/inventories/{id}", dto);
     public async Task<bool> DeleteInventoryAsync(int id) => await Send<bool>(HttpMethod.Delete, $"api/v1/inventories/{id}");
     public async Task<bool> GenInventoryBookAsync(int id) => await Send<bool>(HttpMethod.Post, $"api/v1/inventories/{id}/genbook");
+    public async Task<InventoryDetailResponseDto> GetInventoryDetailByInventoryIdAsync(int id) => await Send<InventoryDetailResponseDto>(HttpMethod.Get, $"api/v1/inventories/{id}/details");
 }

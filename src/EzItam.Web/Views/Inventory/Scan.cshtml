@@ -1,0 +1,240 @@
+﻿@model InventoryDto
+@{
+    ViewData["Title"] = L["invdetail.title"];
+}
+
+
+<!-- HEADER & BREADCRUMB -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a asp-action="Index">@L["invdetail.back"]</a></li>
+                <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Id">@Model.Name</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@L["inv.scan.tittle"]</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- KHUNG GIAO DIỆN CHÍNH 2 CỘT -->
+<div class="row g-4">
+    <!-- CỘT TRÁI: Ô NHẬP LIỆU / QUÉT QR (SCANNER INPUT) -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0 fs-6">📷 @L["inv.scan.scanheader"]</h5>
+            </div>
+            <div class="card-body">
+                <form id="scanForm" autocomplete="off">
+                    <input type="hidden" id="InventoryId" value="@Model.Id" />
+                    
+                    <div class="mb-3">
+                        <label for="assetTagInput" class="form-label fw-bold">@L["inv.scan.assettag"]</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light"><i class="bi bi-qr-code-scan"></i></span>
+                            <input type="text" id="assetTagInput" class="form-control" placeholder="@L["inv.scan.scanheader"]" autofocus required>
+                            <button class="btn btn-primary px-4" type="submit" id="btnSubmitScan">@L["inv.btn.check"]</button>
+                        </div>
+                        <div class="form-text text-muted">@L["inv.scan.guide"]</div>
+                    </div>
+                </form>
+
+                <!-- Khu vực hiển thị thông báo kết quả quét nhanh -->
+                <div id="scanAlert" class="alert d-none mt-3" role="alert"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CỘT PHẢI: HIỂN THỊ VÀ CẬP NHẬT THÔNG TIN THIẾT BỊ VỪA QUÉT -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0" id="scannedItemPanel" style="opacity: 0.6; pointer-events: none;">
+            <div class="card-header bg-success text-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fs-6">📋 @L["Đối chiếu và cập nhật thông tin thiết bị"]</h5>
+                <span class="badge bg-light text-dark" id="scanStatusBadge">@L["Chưa chọn thiết bị"]</span>
+            </div>
+            <div class="card-body">
+                <form id="updateDetailForm">
+                    <input type="hidden" id="DetailId" name="Id" />
+
+                    <!-- THÔNG TIN CHUNG CỦA TÀI SẢN -->
+                    <div class="alert alert-secondary py-2 mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <span class="small text-muted">@L["Tên thiết bị:"]</span><br />
+                                <strong id="lblAssetName" class="text-dark">-</strong>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="small text-muted">@L["Phân loại:"]</span><br />
+                                <strong id="lblCategory" class="text-dark">-</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GIAO DIỆN 2 CỘT ĐỐI XỨNG (TRÁI: GỐC - PHẢI: THỰC TẾ KIỂM KÊ) -->
+                    <div class="row g-3 mb-3">
+                        <!-- CỘT TRÁI: THÔNG TIN GỐC (READONLY) -->
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-light h-100">
+                                <h6 class="text-secondary fw-bold border-bottom pb-2 mb-3">
+                                    📌 @L["Thông tin gốc (Hệ thống)"]
+                                </h6>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small mb-1">@L["Vị trí gốc"]</label>
+                                    <div class="form-control-plaintext fw-semibold bg-white px-2 border rounded" id="lblLocationName">-</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small mb-1">@L["Trạng thái gốc"]</label>
+                                    <div class="form-control-plaintext fw-semibold bg-white px-2 border rounded" id="lblStatusName">-</div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="form-label text-muted small mb-1">@L["Người quản lý gốc"]</label>
+                                    <div class="form-control-plaintext fw-semibold bg-white px-2 border rounded" id="lblEmployeeName">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CỘT PHẢI: THÔNG TIN THỰC TẾ (IV - CÓ THỂ CHỈNH SỬA) -->
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-light-subtle border-success h-100">
+                                <h6 class="text-success fw-bold border-bottom pb-2 mb-3">
+                                    🛠️ @L["Thông tin thực tế (Kiểm kê IV)"]
+                                </h6>
+
+                                <div class="mb-3">
+                                    <label for="IdLocationIV" class="form-label text-success small fw-bold mb-1">@L["Vị trí thực tế"]</label>
+                                    <select id="IdLocationIV" name="IdLocationIV" class="form-select border-success" asp-items="ViewBag.Locations">
+                                        <!-- Dropdown vị trí thực tế -->
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="StatusIV" class="form-label text-success small fw-bold mb-1">@L["Trạng thái thực tế"]</label>
+                                    <select id="StatusIV" name="StatusIV" class="form-select border-success" asp-items="Html.GetEnumSelectList<AssetStatus>()">
+                                        <!-- Dropdown trạng thái thực tế -->
+                                    </select>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label for="IdEmployeeIV" class="form-label text-success small fw-bold mb-1">@L["Người quản lý thực tế"]</label>
+                                    <select id="IdEmployeeIV" name="IdEmployeeIV" class="form-select border-success" asp-items="ViewBag.Employees">
+                                        <!-- Dropdown nhân viên quản lý thực tế -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GHI CHÚ VÀ NÚT LƯU -->
+                    <div class="mb-3">
+                        <label for="Notes" class="form-label fw-bold">@L["Ghi chú chênh lệch"]</label>
+                        <textarea id="Notes" name="Notes" class="form-control" rows="2" placeholder="@L["Nhập ghi chú nếu có thay đổi hoặc hỏng hóc..."]"></textarea>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="button" id="btnSaveScan" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> @L["Xác nhận & Lưu kết quả quét"]
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const assetTagInput = document.getElementById("assetTagInput");
+            const scanForm = document.getElementById("scanForm");
+            const scanAlert = document.getElementById("scanAlert");
+            const scannedItemPanel = document.getElementById("scannedItemPanel");
+            const inventoryId = document.getElementById("InventoryId").value;
+
+            scanForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                let tag = assetTagInput.value.trim();
+                if (!tag) return;
+
+                fetchAssetInfo(tag);
+            });
+
+            function fetchAssetInfo(tag) {
+                fetch(`/Inventory/GetDetailByTag?inventoryId=${inventoryId}&tag=${encodeURIComponent(tag)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById("DetailId").value = data.item.id;
+                            document.getElementById("lblAssetName").textContent = data.item.assetName;
+                            document.getElementById("lblCategory").textContent = data.item.categoryName || "-";
+                            document.getElementById("lblLocationName").textContent = data.item.locationName;
+                            document.getElementById("lblStatusName").textContent = data.item.statusText;
+
+                            document.getElementById("IdLocationIV").value = data.item.idLocationIV;
+                            document.getElementById("StatusIV").value = data.item.statusIV;
+                            document.getElementById("IdEmployeeIV").value = data.item.idEmployeeIV;
+                            document.getElementById("Notes").value = data.item.notes || "";
+
+                            scannedItemPanel.style.opacity = "1";
+                            scannedItemPanel.style.pointerEvents = "auto";
+
+                            showAlert("Đã tìm thấy thiết bị thành công! Vجi lòng kiểm tra lại thông tin.", "success");
+                        } else {
+                            showAlert(data.message || "Không tìm thấy thiết bị trong đợt kiểm kê này.", "danger");
+                            resetPanel();
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        showAlert("Lỗi kết nối tới máy chủ.", "danger");
+                    });
+            }
+
+            document.getElementById("btnSaveScan").addEventListener("click", function () {
+                let formData = {
+                    Id: document.getElementById("DetailId").value,
+                    IdLocationIV: document.getElementById("IdLocationIV").value,
+                    StatusIV: document.getElementById("StatusIV").value,
+                    IdEmployeeIV: document.getElementById("IdEmployeeIV").value,
+                    Notes: document.getElementById("Notes").value
+                };
+
+                fetch('/Inventory/SaveScanResult', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json())
+                    .then(res => {
+                        if (res.success) {
+                            showAlert("Đã lưu kết quả kiểm kê thiết bị thành công!", "success");
+
+                            assetTagInput.value = "";
+                            assetTagInput.focus();
+                            resetPanel();
+                        } else {
+                            showAlert(res.message || "Lỗi khi lưu dữ liệu.", "danger");
+                        }
+                    });
+            });
+
+            function showAlert(message, type) {
+                scanAlert.className = `alert alert-${type} mt-3`;
+                scanAlert.textContent = message;
+                scanAlert.classList.remove("d-none");
+            }
+
+            function resetPanel() {
+                scannedItemPanel.style.opacity = "0.6";
+                scannedItemPanel.style.pointerEvents = "none";
+                document.getElementById("updateDetailForm").reset();
+            }
+        });
+    </script>
+}

@@ -51,7 +51,7 @@ namespace EzItam.Web.Controllers
             return View("Form", model);
         }
 
-        [HttpPut, Authorize(Policy = "CanEdit"), ValidateAntiForgeryToken]
+        [HttpPost, Authorize(Policy = "CanEdit"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, InventoryDto model)
         {
             if (id != model.Id) return BadRequest();
@@ -99,8 +99,18 @@ namespace EzItam.Web.Controllers
         }
         public async Task<IActionResult> Details(int id)
         {
-            var inventories = await Api.ListInventoryAsync();
+            var inventories = await Api.GetInventoryDetailByInventoryIdAsync(id);
             return View(inventories);
+        }
+
+        public async Task<IActionResult> Scan(int id)
+        {
+            var inventory = await Api.GetInventoryByIdAsync(id);
+            if(inventory is null)
+            {
+                return NotFound();
+            }
+            return View(inventory);
         }
     }
 }

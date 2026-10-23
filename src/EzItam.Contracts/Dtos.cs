@@ -440,15 +440,19 @@ public class InventoryDetailDto
 {
     public int Id { get; set; }
     public int IdAsset { get; set; }
+    public string? AssetTag { get; set; }
+    public string? CategoryName { get; set; }
     public string? AssetName { get; set; }
     public int IdLocation { get; set; }
     public string? LocationName { get; set; }
     public int IdEmployee { get; set; }
     public string? EmployeeName { get; set; }
+    public AssetStatus Status { get; set; }
     public int IdLocationIV { get; set; }
     public string? LocationIVName { get; set; }
     public int IdEmployeeIV { get; set; }
     public string? EmployeeIVName { get; set; }
+    public AssetStatus StatusIV { get; set; }
     public int ScanCount { get; set; }
     public string? Notes { get; set; }
     public string? UpdatedBy { get; set; }

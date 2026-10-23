@@ -10,8 +10,9 @@
     <meta charset="utf-8" />
     <title>@ViewData["Title"]</title>
     <style>
+        /* 1. Cấu hình tổng thể khổ giấy máy in là 80x60mm (Ngang 80mm, Dọc 60mm) */
         @@page {
-            size: 50mm 50mm;
+            size: 80mm 60mm;
             margin: 0;
         }
 
@@ -23,36 +24,37 @@
             -webkit-print-color-adjust: exact;
         }
 
-        /* Vùng chứa bọc ngoài để canh giữa khung tem 48x48mm vào giữa khổ giấy 50x50mm */
+        /* 2. Vùng chứa tem: Đặt chiều rộng 80mm, canh lề trái (flex-start) để nội dung dồn sang trái */
         .stamp-page {
-            width: 50mm;
-            height: 50mm;
+            width: 60mm;
+            height: 60mm;
             box-sizing: border-box;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Căn lề sang bên trái của khổ 80mm */
+            padding-left: 3mm; /* Khoảng cách lề trái tối thiểu để không bị dính sát mép mép cuộn giấy */
             page-break-after: always;
             page-break-inside: avoid;
             background: #fff;
         }
 
-        /* Khung viền tem thực tế có kích thước chính xác 48x48mm */
+        /* 3. Khung viền tem thực tế (Ví dụ giữ khung 48x48mm hoặc chỉnh thành kích thước bạn muốn) */
         .stamp-sheet {
-            width: 48mm;
-            height: 48mm;
+            width: 56mm;
+            height: 56mm;
             box-sizing: border-box;
-            padding: 2mm 2.5mm;
+            padding: 2.5mm 3mm;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             background: #fff;
-            border: 2px solid #000;
+            border: 1.5px solid #000; /* Viền tem */
         }
 
-        /* Tiêu đề công ty */
+        /* Các phần bên trong giữ nguyên */
         .stamp-header {
-            font-size: 8px;
+            font-size: 12px;
             font-weight: bold;
             text-align: center;
             text-transform: uppercase;
@@ -64,7 +66,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Phần thân chứa QR và thông tin */
         .stamp-body {
             display: flex;
             align-items: center;
@@ -73,29 +74,20 @@
             margin-top: 1mm;
         }
 
-        .stamp-codes {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 38%;
+        .stamp-codes img {
+            width: 60px !important;
+            height: 60px !important;
+            display: block;
         }
 
-            .stamp-codes img {
-                width: 55px !important;
-                height: 55px !important;
-                display: block;
-            }
-
-        /* Thông tin chi tiết */
         .stamp-info {
             width: 60%;
             font-size: 7px;
             display: flex;
             flex-direction: column;
             justify-content: space-around;
-            height: 100%;
-            padding-left: 1.5mm;
+            height: 80%;
+            padding-left: 1mm;
         }
 
             .stamp-info div {
@@ -104,14 +96,12 @@
                 text-overflow: ellipsis;
             }
 
-        /* Khu vực Barcode phía dưới */
         .barcode-section {
             text-align: center;
             margin-top: 1mm;
             margin-bottom: 0.5mm;
         }
 
-        /* Khai báo sử dụng Font Code 39 cục bộ */
         @@font-face {
             font-family: 'Code39';
             src: url('/fonts/Code39r.ttf') format('truetype');
@@ -124,27 +114,18 @@
             letter-spacing: 1px;
         }
 
-        /* Ẩn các nút điều khiển khi bấm in */
         @@media print {
             .no-print {
                 display: none !important;
             }
         }
-
-        .no-print-bar {
-            padding: 10px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 10px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
     <div class="no-print no-print-bar">
-        <button onclick="window.print();" style="padding: 6px 15px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ In ngay (Print)</button>
-        <div class="row" style="margin-top: 5px;">
-            <span style="font-size: 12px; color: #555;">(Khổ giấy in: 50x50mm | Viền tem: 48x48mm)</span>
+        <button onclick="window.print();" style="padding: 6px 15px; margin-left:30px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ In ngay (Print)</button>
+        <div class="row" style="margin-top: 5px;margin-left:30px;">
+            <span style="font-size: 12px; color: #555;">(Kích thước: 56x56mm)</span>
         </div>
     </div>
 
@@ -159,8 +140,9 @@
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=@Uri.EscapeDataString(asset.AssetTag)" alt="QR Code" />
                     </div>
                     <div class="stamp-info">
-                        <div><strong>Serial:</strong> @asset.SerialNumber</div>
+                        <div><strong>Tag:</strong> @asset.AssetTag</div>
                         <div><strong>Name:</strong> @asset.AssetName</div>
+                        <div><strong>Serial:</strong> @asset.SerialNumber</div>
                         <div><strong>Ip Adress:</strong> @asset.IpAddress</div>
                     </div>
                 </div>
