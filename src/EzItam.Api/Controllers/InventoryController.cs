@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using SQLitePCL;
 
 namespace EzItam.Api.Controllers
 {
@@ -80,11 +83,43 @@ namespace EzItam.Api.Controllers
             return Ok(res);
         }
 
-
+        [Authorize(Policy = "CanEdit")]
         [HttpGet("{id:int}/details")]
         public async Task<ActionResult<InventoryDetailResponseDto?>> GetInventoryDetailByInventoryId(int id)
         {
             var res = await _inventoryService.GetInventoryDetailByInventoryIdAsync(id);
+            return Ok(res);
+        }
+
+        [Authorize(Policy = "CanEdit")]
+        [HttpGet("{id:int}/asset")]
+        public async Task<ActionResult<InventoryDetailDto?>> GetInventoryDetailByInventoryId([FromQuery] string tag, int id)
+        {
+            var res = await _inventoryService.GetDetailByTag(id, tag);
+            return Ok(res);
+        }
+
+        [Authorize(Policy = "CanEdit")]
+        [HttpPost("scan")]
+        public async Task<ActionResult<InventoryDetailDto?>> ScanResult([FromBody] ScanResultRequest req)
+        {
+            try
+            {
+                var res = await _inventoryService.PostScanResult(req);
+                return Ok(new { success = res });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { success = false, message = ex.Message });
+            }
+            
+        }
+
+        [Authorize(Policy = "CanEdit")]
+        [HttpPost("postdiff/{id:int}")]
+        public async Task<ActionResult<InventoryDetailDto?>> PostDiff(int id)
+        {
+            var res = await _inventoryService.PostDiff(id);
             return Ok(res);
         }
     }

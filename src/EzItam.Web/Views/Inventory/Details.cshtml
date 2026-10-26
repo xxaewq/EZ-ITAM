@@ -2,15 +2,12 @@
 @{
     ViewData["Title"] = L["invdetail.title"];
     
-    // Tính toán nhanh số liệu cho các bảng tổng hợp
     var totalAssets = Model.Details.Count;
     var scannedAssets = Model.Details.Count(d => d.ScanCount > 0);
     var unscannedAssets = totalAssets - scannedAssets;
     
-    // Thiết bị có sự thay đổi thông tin (Lệch vị trí IV so với gốc, hoặc lệch nhân viên, hoặc lệch trạng thái)
     var changedAssets = Model.Details.Where(d => d.ScanCount > 0 && (d.IdLocation != d.IdLocationIV || d.IdEmployee != d.IdEmployeeIV || d.Status != d.StatusIV)).ToList();
 
-    // Gom nhóm theo phân loại (Category) để làm bảng tổng hợp số lượng scan
     var categoryStats = Model.Details
         .GroupBy(d => d.CategoryName)
         .Select(g => new
@@ -33,12 +30,12 @@
         </nav>
     </div>
     <div class="d-flex gap-2">
-        <a class="btn btn-outline-success btn-sm" asp-action="Scan" asp-route-id="@Model.Id">
+        <a class="btn btn-success btn-sm @(unscannedAssets > 0 ? "" : "disabled")" asp-action="Scan" asp-route-id="@Model.Id">
             <i class="bi bi-file-earmark-excel"></i> @L["inv.btn.scan"]
         </a>
 
-        <a class="btn btn-outline-secondary btn-sm" asp-action="Export" asp-route-id="@Model.Id">
-            <i class="bi bi-file-earmark-excel"></i> @L["inv.btn.export"]
+        <a class="btn btn-info btn-sm @(unscannedAssets > 0 ? "disabled" : "")" id="btnPostDiff" asp-action="PostDiff" asp-route-id="@Model.Id">
+            <i class="bi bi-file-earmark-excel"></i> @L["inv.btn.postdiff"]
         </a>
     </div>
 </div>
@@ -81,7 +78,6 @@
 
 <!-- 3. KHU VỰC 2 BẢNG NHỎ TỔNG HỢP (PHÂN LOẠI & THAY ĐỔI) -->
 <div class="row g-3 mb-4">
-    <!-- Bảng nhỏ 1: Tổng hợp số lượng đã scan theo phân loại -->
     <div class="col-lg-6">
         <div class="card h-100 shadow-sm">
             <div class="card-header bg-light py-2">
@@ -119,7 +115,6 @@
         </div>
     </div>
 
-    <!-- Bảng nhỏ 2: Tổng hợp những thiết bị đã bị thay đổi thông tin -->
     <div class="col-lg-6">
         <div class="card h-100 shadow-sm">
             <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
@@ -253,5 +248,34 @@
             $('#changedItemsTable').DataTable({
             });
         });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const btnPostDiff = document.getElementById("btnPostDiff");
+
+            if (btnPostDiff) {
+                btnPostDiff.addEventListener("click", function (e) {
+                    // 1. Nếu nút đang bị disabled thì chặn lại
+                    if (this.classList.contains("disabled") || this.getAttribute("aria-disabled") === "true") {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // 2. Chặn hành vi chuyển hướng mặc định của thẻ <a>
+                    e.preventDefault();
+                    const targetUrl = this.href; // Lấy URL tự động sinh bởi asp-action
+                    console.log(targetUrl);
+
+                    // 3. Hiển thị hộp thoại xác nhận mặc định của trình duyệt
+                    const isConfirmed = confirm('@L["Bạn có chắc chắn muốn tổng kết chênh lệch và cập nhật dữ liệu vào hệ thống không?"]');
+
+                    // 4. Nếu người dùng chọn OK, trình duyệt sẽ tự động gọi đến Controller thông qua URL
+                    if (isConfirmed) {
+                        window.location.href = targetUrl;
+                    }
+                });
+            }
+        });
+
     </script>
 }

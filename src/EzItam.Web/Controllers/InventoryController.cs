@@ -62,9 +62,10 @@ namespace EzItam.Web.Controllers
                 Success(L["inv.update.successfully"]);
                 return RedirectToAction(nameof(Index));
             }
-            catch (ApiException ex) {
+            catch (ApiException ex)
+            {
                 AddApiError(ex);
-                return View("Form", model); 
+                return View("Form", model);
             }
         }
 
@@ -76,9 +77,9 @@ namespace EzItam.Web.Controllers
                 await Api.DeleteInventoryAsync(id);
                 Success(L["inv.delete.successfully"]);
             }
-            catch (ApiException ex) 
-            { 
-                Error(L[ex.Message]); 
+            catch (ApiException ex)
+            {
+                Error(L[ex.Message]);
             }
             return RedirectToAction(nameof(Index));
         }
@@ -103,14 +104,87 @@ namespace EzItam.Web.Controllers
             return View(inventories);
         }
 
+        [Authorize(Policy = "CanEdit")]
         public async Task<IActionResult> Scan(int id)
         {
             var inventory = await Api.GetInventoryByIdAsync(id);
-            if(inventory is null)
+            if (inventory is null)
             {
                 return NotFound();
             }
+            SetViewBagStatus();
+            await SetViewBagLocation();
+            await SetViewBagEmployee();
+
             return View(inventory);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "CanEdit")]
+        public async Task<ObjectResult> GetDetailByTag(int inventoryId, string tag)
+        {
+            var detailByTag = await Api.GetAssetByInventoryIdAndTag(inventoryId, tag);
+            if (detailByTag is null || detailByTag.Id == 0)
+            {
+                return Ok(new { success = false, message = L["inv.scan.invalid"] });
+            }
+            return Ok(new { success = true, item = detailByTag });
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "CanEdit")]
+        public async Task<ObjectResult> SaveScanResult([FromBody]ScanResultRequest req)
+        {
+            var res = await Api.PostScanResult(req);
+            return Ok(new
+            {
+                success = res
+            });
+        }
+
+        [Authorize(Policy = "CanEdit")]
+        public async Task<IActionResult> PostDiff(int id)
+        {
+            try
+            {
+                await Api.PostDiff(id);
+                Success(L["inv.postdiff.successfully"]);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Error(L[ex.Message]);
+            }
+            return RedirectToAction(nameof(Details), new {id});
+        }
+
+
+
+        public void SetViewBagStatus(string? selectedValue = null)
+        {
+            var selectList = Enum.GetValues(typeof(AssetStatus))
+                .Cast<AssetStatus>()
+                .Select(status => new SelectListItem
+                {
+                    Value = ((int)status).ToString(),
+                    Text = status.ToString(),
+                    Selected = selectedValue != null && ((int)status).ToString() == selectedValue
+                })
+                .ToList();
+
+            ViewBag.StatusList = selectList;
+        }
+
+        public async Task SetViewBagLocation()
+        {
+            ViewBag.LocationList = await OptionsAsync("locations");
+            await Task.CompletedTask;
+        }
+
+        public async Task SetViewBagEmployee()
+        {
+            ViewBag.EmployeeList = await OptionsAsync("employees");
+            await Task.CompletedTask;
         }
     }
 }

@@ -164,5 +164,13 @@ public sealed class ItamApiClient
     public async Task<bool> UpdateInventoryAsync(int id, InventoryDto dto) => await Send<bool>(HttpMethod.Put, $"api/v1/inventories/{id}", dto);
     public async Task<bool> DeleteInventoryAsync(int id) => await Send<bool>(HttpMethod.Delete, $"api/v1/inventories/{id}");
     public async Task<bool> GenInventoryBookAsync(int id) => await Send<bool>(HttpMethod.Post, $"api/v1/inventories/{id}/genbook");
-    public async Task<InventoryDetailResponseDto> GetInventoryDetailByInventoryIdAsync(int id) => await Send<InventoryDetailResponseDto>(HttpMethod.Get, $"api/v1/inventories/{id}/details");
+    public async Task<InventoryDetailResponseDto?> GetInventoryDetailByInventoryIdAsync(int id) => await Send<InventoryDetailResponseDto?>(HttpMethod.Get, $"api/v1/inventories/{id}/details");
+    public async Task<InventoryDetailDto?> GetAssetByInventoryIdAndTag(int id, string tag)
+    {
+        var fromQuery = Query($"api/v1/inventories/{id}/asset", new { tag });
+        return await Send<InventoryDetailDto?>(HttpMethod.Get, fromQuery);
+    }
+
+    public async Task<bool> PostScanResult(ScanResultRequest req) => await Send<bool>(HttpMethod.Post, "api/v1/inventories/scan", req);
+    public async Task<bool> PostDiff(int id) => await Send<bool>(HttpMethod.Post, $"api/v1/inventories/postdiff/{id}");
 }

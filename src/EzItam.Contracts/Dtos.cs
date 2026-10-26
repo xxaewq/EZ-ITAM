@@ -464,15 +464,18 @@ public class InventoryDetailResponseDto : InventoryDto
     public List<InventoryDetailDto> Details { get; set; } = [];
 }
 
-public class ScanAssetDto
+public class ScanResultRequest
 {
-    public int InventoryId { get; set; }
-    public int IdAsset { get; set; }
-    public int IdLocationIV { get; set; }
-    public int IdEmployeeIV { get; set; }
-    public AssetStatus AssetStatusIV { get; set; }
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+    [JsonPropertyName("idLocationIV")]
+    public int? IdLocationIV { get; set; }
+    [JsonPropertyName("statusIV")]
+    public int StatusIV { get; set; }
+    [JsonPropertyName("idEmployeeIV")]
+    public int? IdEmployeeIV { get; set; }
+    [JsonPropertyName("notes")]
     public string? Notes { get; set; }
-    public string UpdatedBy { get; set; } = string.Empty;
 }
 
 public class ScanResultDto

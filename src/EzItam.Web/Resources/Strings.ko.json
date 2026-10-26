@@ -84,6 +84,7 @@
   "inv.btn.export": "보고서 생성",
   "inv.btn.scan": "주사",
   "inv.btn.check": "확인하다",
+  "inv.btn.postdiff": "차이점을 확인하세요",
   "inv.table.name": "재고 이름",
   "inv.table.date": "재고 날짜",
   "inv.table.status": "재고 현황",
@@ -99,7 +100,8 @@
   "inv.update.fail": "업데이트 실패.",
   "inv.delete.successfully": "삭제가 완료되었습니다.",
   "inv.delete.fail": "삭제 실패.",
-  "invdetail.title": "Inventory Detaisl",
+  "inv.postdiff.successfully": "차이점을 성공적으로 확인했습니다.",
+  "invdetail.title": "재고 상세 정보",
   "invdetail.back": "재고 목록",
   "invdetail.totalassets": "총자산",
   "invdetail.scanned": "스캔됨",
@@ -122,6 +124,17 @@
   "inv.scan.tittle": "스캔 자산",
   "inv.scan.scanheader": "자산 태그 코드를 입력하거나 스캔하세요",
   "inv.scan.assettag": "자산 태그",
-  "inv.scan.guide": "마우스 커서를 이 상자 안에 놓고 바코드 스캐너를 사용하거나, 직접 입력하고 Enter 키를 누르세요."
+  "inv.scan.guide": "마우스 커서를 이 상자 안에 놓고 바코드 스캐너를 사용하거나, 직접 입력하고 Enter 키를 누르세요.",
+  "inv.scan.compareheader": "자산 정보를 비교하고 업데이트하세요.",
+  "inv.scan.null": "자산이 선택되지 않았습니다",
+  "inv.scan.assetname": "자산명",
+  "inv.scan.category": "범주",
+  "inv.scan.information": "시스템 정보",
+  "inv.scan.informationiv": "정보의 사실 확인",
+  "inv.scan.notes": "메모",
+  "inv.scan.scansuccessfully": "장치를 성공적으로 찾았습니다.",
+  "inv.scan.alreadyscan": "장비 목록 작성이 완료되었습니다.",
+  "inv.scan.invalid": "잘못된 태그 코드입니다.",
+  "inv.scan.savesuccessfully": "성공적인 결과를 저장하세요."
 
 }

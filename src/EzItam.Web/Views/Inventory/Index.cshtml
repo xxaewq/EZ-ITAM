@@ -40,7 +40,7 @@
 								<a class="btn btn-sm btn-outline-secondary @(l.InventoryStatus != InventoryStatus.Closed ? "enabled" : "disabled")" asp-action="Edit" asp-route-id="@l.Id">@L["inv.btn.update"]</a>
 								<a class="btn btn-sm btn-outline-success @(l.InventoryStatus == InventoryStatus.Open ? "enabled" : "disabled")" asp-action="Genbook" asp-route-id="@l.Id">@L["inv.btn.genbook"]</a>
 								
-								@if (isAdmin && l.InventoryStatus == InventoryStatus.Open)
+								@if (isAdmin && l.InventoryStatus != InventoryStatus.Closed)
 								{
 									<partial name="_ConfirmDelete" model="@(("Inventory", (object)l.Id, l.Name))" />
 								}

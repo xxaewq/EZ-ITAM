@@ -495,6 +495,7 @@
   "inv.btn.export": "Xuất báo cáo",
   "inv.btn.scan": "Quét thiết bị",
   "inv.btn.check": "Kiểm tra",
+  "inv.btn.postdiff": "Xác nhận chênh lệch",
   "inv.table.name": "Tên kỳ kiểm kê",
   "inv.table.date": "Thời gian kiểm kê",
   "inv.table.status": "Trạng thái",
@@ -510,7 +511,8 @@
   "inv.update.fail": "Cập nhật thất bại.",
   "inv.delete.successfully": "Xóa thành công.",
   "inv.delete.fail": "Xóa thất bại.",
-  "invdetail.title": "재고 상세 정보",
+  "inv.postdiff.successfully": "Xác nhận chênh lệch thành công.",
+  "invdetail.title": "Chi tiết kỳ kiểm kê",
   "invdetail.back": "Danh sách kỳ kiểm kê",
   "invdetail.totalassets": "Tổng thiết bị",
   "invdetail.scanned": "Đã kiểm kê",
@@ -533,7 +535,18 @@
   "inv.scan.tittle": "Quét mã thiết bị",
   "inv.scan.scanheader": "Nhập hoặc quét mã Asset Tag",
   "inv.scan.assettag": "Mã thiết bị",
-  "inv.scan.guide": "Đặt con trỏ chuột vào ô này và sử dụng máy quét mã vạch, hoặc nhập thủ công rồi nhấn Enter."
+  "inv.scan.guide": "Đặt con trỏ chuột vào ô này và sử dụng máy quét mã vạch, hoặc nhập thủ công rồi nhấn Enter.",
+  "inv.scan.compareheader": "Đối chiếu và cập nhật thông tin thiết bị.",
+  "inv.scan.null": "Chưa chọn thiết bị",
+  "inv.scan.assetname": "Tên thiết bị",
+  "inv.scan.category": "Phân loại",
+  "inv.scan.information": "Thông tin hệ thống",
+  "inv.scan.informationiv": "Thông tin kiểm kê",
+  "inv.scan.notes": "Ghi chú",
+  "inv.scan.scansuccessfully": "Tìm thấy thiết bị thành công.",
+  "inv.scan.alreadyscan": "Thiết bị đã được kiểm kê.",
+  "inv.scan.invalid": "Mã tag không hợp lệ.",
+  "inv.scan.savesuccessfully": "Lưu kết quả thành công."
 
 
 }

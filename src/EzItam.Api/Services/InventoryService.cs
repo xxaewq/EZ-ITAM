@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.IdentityModel.Tokens;
 
 namespace EzItam.Api.Services
 {
@@ -16,6 +17,9 @@ namespace EzItam.Api.Services
         Task<bool> DeleteInventoryAsync(int id);
         Task<bool> IsAnyNotCloseInvetoryAsync();
         Task<InventoryDetailResponseDto?> GetInventoryDetailByInventoryIdAsync(int id);
+        Task<InventoryDetailDto?> GetDetailByTag(int inventoryId, string tag);
+        Task<bool> PostScanResult(ScanResultRequest req);
+        Task<bool> PostDiff(int inventoryId);
     }
 
 
@@ -38,7 +42,7 @@ namespace EzItam.Api.Services
                 return false;
             }
 
-            inventory.InventoryStatus = InventoryStatus.Completed;
+            inventory.InventoryStatus = InventoryStatus.Closed;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -78,7 +82,7 @@ namespace EzItam.Api.Services
             }
 
             // 2. Kiểm tra xem đợt kiểm kê này đã được đồng bộ danh sách thiết bị trước đó chưa
-            if(inventory.InventoryStatus == InventoryStatus.InProgress)
+            if (inventory.InventoryStatus == InventoryStatus.InProgress)
             {
                 throw new DomainException("The inventory has already been synchronized.");
             }
@@ -90,14 +94,14 @@ namespace EzItam.Api.Services
                 var transaction = await _context.Database.BeginTransactionAsync();
                 try
                 {
-                    var allAssets = await _context.Assets.ToListAsync();
+                    var allAssetsExceptDisposedAndLost = await _context.Assets.Where(d => d.Status != AssetStatus.Disposed && d.Status != AssetStatus.Lost).ToListAsync();
 
-                    if (allAssets.Count == 0)
+                    if (allAssetsExceptDisposedAndLost.Count == 0)
                     {
                         throw new DomainException("No assets found in the system to inventory.");
                     }
 
-                    var inventoryDetails = allAssets.Select(asset => new InventoryDetail
+                    var inventoryDetails = allAssetsExceptDisposedAndLost.Select(asset => new InventoryDetail
                     {
                         InventoryId = id,
                         IdAsset = asset.Id,
@@ -114,7 +118,6 @@ namespace EzItam.Api.Services
                     }).ToList();
 
                     _context.InventoryDetails.AddRange(inventoryDetails);
-                    await _context.SaveChangesAsync();
 
                     inventory.InventoryStatus = InventoryStatus.InProgress;
                     await _context.SaveChangesAsync();
@@ -135,7 +138,7 @@ namespace EzItam.Api.Services
         {
             var model = await _context.Inventories.FindAsync(id) ?? throw new DomainException("Not found.");
 
-            if(model.InventoryStatus != InventoryStatus.Open)
+            if (model.InventoryStatus == InventoryStatus.Closed)
             {
                 throw new DomainException("Can't delete.");
             }
@@ -191,7 +194,7 @@ namespace EzItam.Api.Services
                 return false;
             }
 
-            if(inventory.InventoryStatus == InventoryStatus.Closed)
+            if (inventory.InventoryStatus == InventoryStatus.Closed)
             {
                 throw new DomainException("Unable to update the closed inventory.");
             }
@@ -223,9 +226,9 @@ namespace EzItam.Api.Services
                 })
                 .FirstOrDefaultAsync();
 
-            if (inventory == null)
+            if (inventory is null)
             {
-                return null;
+                return new();
             }
 
             // 2. Lấy danh sách chi tiết thiết bị kiểm kê và kết hợp các bảng liên quan
@@ -266,6 +269,117 @@ namespace EzItam.Api.Services
                 .ToListAsync();
 
             return inventory;
+        }
+
+        public async Task<InventoryDetailDto?> GetDetailByTag(int inventoryId, string tag)
+        {
+            var invDetail = await _context.InventoryDetails
+                .AsNoTracking()
+                .Include(d => d.Asset)
+                    .ThenInclude(a => a.Category)
+                .Include(d => d.Location)
+                .Include(d => d.LocationIV)
+                .Include(d => d.Employee)
+                    .ThenInclude(d => d.Department)
+                .Include(d => d.EmployeeIV)
+                    .ThenInclude(d => d.Department)
+                .Where(d => d.InventoryId == inventoryId && d.Asset != null && d.Asset.AssetTag == tag)
+                .FirstOrDefaultAsync();
+            if (invDetail is null) return new();
+
+            return new InventoryDetailDto
+            {
+                Id = invDetail.Id,
+                IdAsset = invDetail.IdAsset,
+                AssetTag = invDetail.Asset?.AssetTag,
+                CategoryName = invDetail.Asset?.Category?.Name,
+                AssetName = invDetail.Asset?.Name,
+
+                IdLocation = invDetail.IdLocation ?? 0,
+                LocationName = invDetail.Location?.Name,
+                IdLocationIV = invDetail.IdLocationIV ?? 0,
+                LocationIVName = invDetail.LocationIV?.Name,
+
+                IdEmployee = invDetail.IdEmployee ?? 0,
+                EmployeeName = (invDetail.IdEmployee is null || invDetail.IdEmployee == 0) ? null : (invDetail.Employee?.Department != null ? invDetail.Employee?.Department.Name + " / " : "") + invDetail.Employee?.Name + " (" + invDetail.Employee?.EmployeeNo + ")",
+                IdEmployeeIV = invDetail.IdEmployeeIV ?? 0,
+                EmployeeIVName = (invDetail.IdEmployeeIV is null || invDetail.IdEmployeeIV == 0) ? null : (invDetail.EmployeeIV?.Department != null ? invDetail.EmployeeIV?.Department.Name + " / " : "") + invDetail.EmployeeIV?.Name + " (" + invDetail.EmployeeIV?.EmployeeNo + ")",
+
+                Status = invDetail.Status,
+                StatusIV = invDetail.AssetStatusIV,
+
+                ScanCount = invDetail.ScanCount,
+                Notes = invDetail.Notes,
+                UpdatedBy = invDetail.UpdatedBy,
+                UpdatedTime = invDetail.UpdatedTime
+            };
+        }
+
+        public async Task<bool> PostScanResult(ScanResultRequest req)
+        {
+            var invAsset = await _context.InventoryDetails.FindAsync(req.Id) ?? throw new DomainException("Not found");
+
+            invAsset.IdLocationIV = req.IdLocationIV;
+            invAsset.IdEmployeeIV = req.IdEmployeeIV;
+            invAsset.AssetStatusIV = (AssetStatus)req.StatusIV;
+            invAsset.Notes = req.Notes;
+            invAsset.ScanCount += 1;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> PostDiff(int inventoryId)
+        {
+
+
+            var strategy = _context.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
+            {
+                var inventory = await _context.Inventories.Where(i => i.Id == inventoryId).FirstOrDefaultAsync() ?? throw new DomainException("Inventory not found.");
+                if (inventory.InventoryStatus != InventoryStatus.InProgress)
+                {
+                    throw new DomainException("Unable to post this inventory.");
+                }
+
+                var assets = await _context.InventoryDetails
+                                    .Where(d => d.InventoryId == inventoryId && (d.IdEmployee != d.IdEmployeeIV || d.IdLocation != d.IdLocationIV || d.Status != d.AssetStatusIV))
+                                    .ToListAsync();
+
+                var assetIds = assets.Select(d => d.IdAsset).Distinct().ToList();
+
+                var assetsToUpdate = await _context.Assets
+                    .Where(a => assetIds.Contains(a.Id))
+                    .ToListAsync();
+
+
+                var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    foreach (var item in assets)
+                    {
+                        var asset = assetsToUpdate.FirstOrDefault(a => a.Id == item.IdAsset);
+                        if (asset != null)
+                        {
+                            asset.LocationId = item.IdLocationIV;
+                            asset.CurrentEmployeeId = item.IdEmployeeIV;
+                            asset.Status = item.AssetStatusIV;
+                        }
+                    }
+
+                    inventory.InventoryStatus = inventory.InventoryStatus + 1;
+                    await _context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
         }
     }
 }
