@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using SQLitePCL;
+using System.Net;
 
 namespace EzItam.Api.Controllers
 {
@@ -101,23 +102,23 @@ namespace EzItam.Api.Controllers
 
         [Authorize(Policy = "CanEdit")]
         [HttpPost("scan")]
-        public async Task<ActionResult<InventoryDetailDto?>> ScanResult([FromBody] ScanResultRequest req)
+        public async Task<ActionResult<bool>> ScanResult([FromBody] ScanResultRequest req)
         {
             try
             {
                 var res = await _inventoryService.PostScanResult(req);
-                return Ok(new { success = res });
+                return Ok(res);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Ok(new { success = false, message = ex.Message });
+                return Ok(false);
             }
             
         }
 
         [Authorize(Policy = "CanEdit")]
         [HttpPost("postdiff/{id:int}")]
-        public async Task<ActionResult<InventoryDetailDto?>> PostDiff(int id)
+        public async Task<ActionResult<bool>> PostDiff(int id)
         {
             var res = await _inventoryService.PostDiff(id);
             return Ok(res);

@@ -135,11 +135,23 @@ namespace EzItam.Web.Controllers
         [Authorize(Policy = "CanEdit")]
         public async Task<ObjectResult> SaveScanResult([FromBody]ScanResultRequest req)
         {
-            var res = await Api.PostScanResult(req);
-            return Ok(new
+            try
             {
-                success = res
-            });
+                var res = await Api.PostScanResult(req);
+                return Ok(new
+                {
+                    success = res
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+            
         }
 
         [Authorize(Policy = "CanEdit")]

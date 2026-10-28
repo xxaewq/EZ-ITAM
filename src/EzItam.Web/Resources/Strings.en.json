@@ -506,9 +506,6 @@
   "inv.table.action": "Action",
   "inv.table.note": "Note",
 
-
-
-
   "inv.create.successfully": "Create successfully.",
   "inv.create.fail": "Create fail.",
   "inv.update.successfully": "Update successfully.",
@@ -527,6 +524,7 @@
   "invdetail.progress": "Progress",
   "invdetail.changereport": "Report devices that change information",
   "invdetail.detailreport": "Inventory list of asset",
+  "invdetail.postdiffmessage": "Would you like to summarize the differences and update the system data?",
   "invdetail.table.asset": "Asset",
   "invdetail.table.location": "Location",
   "invdetail.table.locationiv": "Location (Inventory)",

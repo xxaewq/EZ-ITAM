@@ -121,7 +121,7 @@
                 <h6 class="mb-0 fw-bold text-warning text-dark">⚠️ @L["invdetail.changereport"]</h6>
                 <span class="badge bg-warning text-dark">@changedAssets.Count thiết bị</span>
             </div>
-            <div class="table-responsive" style="max-height: 220px; overflow-y: auto;">
+            <div class="table-responsive" style="overflow-y: auto;">
                 <table class="table table-sm table-hover mb-0 align-middle small" id="changedItemsTable" style="width:100%">
                     <thead class="table-light sticky-top">
                         <tr>
@@ -264,10 +264,9 @@
                     // 2. Chặn hành vi chuyển hướng mặc định của thẻ <a>
                     e.preventDefault();
                     const targetUrl = this.href; // Lấy URL tự động sinh bởi asp-action
-                    console.log(targetUrl);
 
                     // 3. Hiển thị hộp thoại xác nhận mặc định của trình duyệt
-                    const isConfirmed = confirm('@L["Bạn có chắc chắn muốn tổng kết chênh lệch và cập nhật dữ liệu vào hệ thống không?"]');
+                    const isConfirmed = confirm(@Json.Serialize(L["invdetail.postdiffmessage"].Value));
 
                     // 4. Nếu người dùng chọn OK, trình duyệt sẽ tự động gọi đến Controller thông qua URL
                     if (isConfirmed) {

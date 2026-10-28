@@ -33,6 +33,7 @@ public class AppDbContext : IdentityDbContext
 
     public DbSet<Inventory> Inventories => Set<Inventory>();
     public DbSet<InventoryDetail> InventoryDetails => Set<InventoryDetail>();
+    public DbSet<EmployeeTemp> EmployeeTemps => Set<EmployeeTemp>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -156,6 +157,39 @@ public class AppDbContext : IdentityDbContext
             e.Property(d => d.ScanCount).IsRequired().HasDefaultValue(0);
             e.HasIndex(d => new { d.InventoryId, d.IdAsset }).IsUnique();
             e.HasIndex(d => new { d.InventoryId, d.ScanCount });
+        });
+
+        builder.Entity<Employee>(e =>
+        {
+            e.Property(d => d.Source).IsRequired(false);
+        });
+        builder.Entity<EmployeeTemp>(e =>
+        {
+            e.ToTable("EmployeeTemps");
+            e.Property(d => d.Id);
+            e.Property(d => d.OrgCode).IsRequired(true);
+            e.Property(d => d.EmployeeNo).IsRequired(true);
+            e.Property(d => d.Name).IsRequired(true);
+            e.Property(d => d.Email).IsRequired(false);
+            e.Property(d => d.DeptCode).IsRequired(false);
+            e.Property(d => d.DeptName).IsRequired(false);
+            e.Property(d => d.DeptLevel).IsRequired(false);
+            e.Property(d => d.TitleCode).IsRequired(false);
+            e.Property(d => d.TitleName).IsRequired(false);
+            e.Property(d => d.PositionCode).IsRequired(false);
+            e.Property(d => d.PositionName).IsRequired(false);
+            e.Property(d => d.IsResigned).IsRequired(false);
+            e.Property(d => d.DateValue1).IsRequired(false);
+            e.Property(d => d.DateValue2).IsRequired(false);
+            e.Property(d => d.DateValue3).IsRequired(false);
+            e.Property(d => d.DateValue4).IsRequired(false);
+            e.Property(d => d.DateValue5).IsRequired(false);
+            e.Property(d => d.DateValue6).IsRequired(false);
+            e.Property(d => d.DateValue7).IsRequired(false);
+            e.Property(d => d.DateValue8).IsRequired(false);
+            e.Property(d => d.DateValue9).IsRequired(false);
+
+            e.HasIndex(d => new { d.OrgCode, d.EmployeeNo }).IsUnique();
         });
 
 

@@ -484,3 +484,19 @@ public class ScanResultDto
     public string Message { get; set; } = string.Empty;
     public int ScanCount { get; set; }
 }
+
+public class HrEmployeeDto
+{
+    public string OrgCode { get; set; } = string.Empty;
+    public string Code { get; set; } = string.Empty;
+    public string EmployeeName { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? DeptCode { get; set; }
+    public string? DeptName { get; set; }
+    public string? DeptLevel { get; set; }
+    public string? TitleCode { get; set; }
+    public string? TitleName { get; set; }
+    public string? PositionCode { get; set; }
+    public string? PositionName { get; set; }
+    public string? IsResigned { get; set; }
+}

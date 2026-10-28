@@ -112,6 +112,7 @@
   "invdetail.progress": "진전",
   "invdetail.changereport": "정보가 변경된 기기를 신고해 주세요",
   "invdetail.detailreport": "자산 목록",
+  "invdetail.postdiffmessage": "차이점을 요약하고 시스템의 데이터를 업데이트하시겠습니까?",
   "invdetail.table.asset": "장치",
   "invdetail.table.location": "위치",
   "invdetail.table.locationiv": "위치 (현실)",

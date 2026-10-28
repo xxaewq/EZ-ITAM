@@ -173,4 +173,8 @@ public sealed class ItamApiClient
 
     public async Task<bool> PostScanResult(ScanResultRequest req) => await Send<bool>(HttpMethod.Post, "api/v1/inventories/scan", req);
     public async Task<bool> PostDiff(int id) => await Send<bool>(HttpMethod.Post, $"api/v1/inventories/postdiff/{id}");
+
+
+    public async Task<List<HrEmployeeDto>> GetListEmployeesByOrgCode(string orgCode) => await Send<List<HrEmployeeDto>>(HttpMethod.Get, $"api/v1/external/hr/employees?orgCode={orgCode}");
+
 }

@@ -1,13 +1,14 @@
-using System.Globalization;
-using System.Text;
-using EzItam.Api.Data;
-using EzItam.Api.Infrastructure;
-using EzItam.Api.Services;
+using EzItam.Api.Configurations;
+using EzItam.Api.ExternalService;
+using EzItam.Api.Infrastructure.BackgroundJobs;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,18 @@ var builder = WebApplication.CreateBuilder(args);
 var profile = Environment.GetEnvironmentVariable("EZITAM_PROFILE");
 if (!string.IsNullOrWhiteSpace(profile))
     builder.Configuration.AddJsonFile($"appsettings.{profile}.json", optional: true, reloadOnChange: true);
+
+// ---------- Hangfire configuaration ----------
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("Hangfire")));
+
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = Environment.ProcessorCount * 2; // Số lượng worker xử lý song song
+});
 
 // ---------- Database (API 만 DB에 접근합니다) ----------
 var provider = builder.Configuration["Database:Provider"] ?? "SqlServer";
@@ -79,11 +92,10 @@ builder.Services.AddScoped<ILicenseService, LicenseService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<HrService>();
 
 builder.Services.AddSingleton<IUpdateCatalog>(_ => new UpdateCatalog(
     builder.Configuration["Updates:Root"] is { Length: > 0 } root ? root : Path.Combine(builder.Environment.ContentRootPath, "updates")));
-
-
 
 builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilter>())
     .AddJsonOptions(o => o.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never);
@@ -121,6 +133,28 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseHsts();
+}
+
+
+// Cấu hình Hangfire Dashboard
+app.UseHangfireDashboard("/hangfire");
+// Định nghĩa Recurring Job chạy vào 03:00 AM Chủ Nhật hàng tuần
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+    var jobSettings = configuration.GetSection(HangFireJobSettings.SectionName).Get<HangFireJobSettings>()
+                      ?? new HangFireJobSettings();
+
+    recurringJobManager.AddOrUpdate<EmployeeSyncBackgroundService>(
+        jobSettings.HrSync.JobId,
+        service => service.SyncEmployeeDataAsync(jobSettings.HrSync.OrgCode, CancellationToken.None),
+        jobSettings.HrSync.CronExpression,
+        new RecurringJobOptions {
+        TimeZone = TimeZoneInfo.Local
+        }
+    );
 }
 
 app.UseHttpsRedirection();

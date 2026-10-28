@@ -523,6 +523,7 @@
   "invdetail.progress": "Tiến độ",
   "invdetail.changereport": "Báo cáo các thiết bị thay đổi thông tin",
   "invdetail.detailreport": "Danh sách chi tiết các thiết bị",
+  "invdetail.postdiffmessage": "Bạn có chắc chắn muốn tổng kết chênh lệch và cập nhật dữ liệu vào hệ thống không?",
   "invdetail.table.asset": "Thiết bị",
   "invdetail.table.location": "Vị trí",
   "invdetail.table.locationiv": "Vị trí (Kiểm kê)",
