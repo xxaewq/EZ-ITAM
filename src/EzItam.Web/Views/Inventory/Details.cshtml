@@ -121,7 +121,7 @@
                 <h6 class="mb-0 fw-bold text-warning text-dark">⚠️ @L["invdetail.changereport"]</h6>
                 <span class="badge bg-warning text-dark">@changedAssets.Count thiết bị</span>
             </div>
-            <div class="table-responsive" style="overflow-y: auto;">
+            <div class="table-responsive">
                 <table class="table table-sm table-hover mb-0 align-middle small" id="changedItemsTable" style="width:100%">
                     <thead class="table-light sticky-top">
                         <tr>
@@ -132,12 +132,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @{
-                            int cIndex = 0;
-                        }
                         @foreach (var item in changedAssets)
                         {
-                            <tr class="changed-row" data-index="@(cIndex++)" style="@(cIndex > 5 ? "display:none;" : "")">
+                            <tr>
                                 <td><strong>@item.AssetTag | @item.AssetName</strong></td>
                                 <td>
                                     @if (item.IdLocation != item.IdLocationIV)

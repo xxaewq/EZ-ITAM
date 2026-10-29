@@ -17,4 +17,10 @@
     <ProjectReference Include="..\EzItam.Contracts\EzItam.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

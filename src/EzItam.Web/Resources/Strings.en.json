@@ -20,6 +20,7 @@
   "nav.users": "User management",
   "nav.password": "Password",
   "nav.logout": "Log out",
+  "nav.backgroundjob": "Background Job",
   "role.admin": "Administrator",
   "role.manager": "Manager",
   "role.viewer": "Viewer",

@@ -20,6 +20,7 @@
   "nav.users": "사용자 관리",
   "nav.password": "비밀번호",
   "nav.logout": "로그아웃",
+  "nav.backgroundjob": "백그라운드 작업",
   "role.admin": "관리자",
   "role.manager": "담당자",
   "role.viewer": "조회자",

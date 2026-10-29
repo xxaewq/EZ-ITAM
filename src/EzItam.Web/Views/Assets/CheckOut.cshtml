@@ -1,21 +1,41 @@
 @model CheckOutViewModel
-@{ ViewData["Title"] = L["불출"]; }
+@{
+	ViewData["Title"] = L["불출"];
+}
 <partial name="_PageHeader" model="@(L["불출 - {0} {1}", Model.AssetTag, Model.AssetName].Value)" />
-<div class="card" style="max-width:560px"><div class="card-body">
-    <form asp-action="CheckOut" method="post" data-once>
-        <input type="hidden" asp-for="AssetId" /><input type="hidden" asp-for="AssetTag" /><input type="hidden" asp-for="AssetName" />
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2"></div>
-        <div class="mb-3">
-            <label asp-for="EmployeeId" class="form-label"></label>
-            <select asp-for="EmployeeId" class="form-select" asp-items="ViewBag.Employees"><option value="">@L["-- 사용자 선택 --"]</option></select>
-            <span asp-validation-for="EmployeeId" class="text-danger small"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Notes" class="form-label"></label>
-            <input asp-for="Notes" class="form-control" placeholder="@L["예: 신규 입사자 지급"]" />
-        </div>
-        <button type="submit" class="btn btn-success">@L["불출 처리"]</button>
-        <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.AssetId">@L["취소"]</a>
-    </form>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+<div class="card" style="max-width:560px">
+	<div class="card-body">
+		<form asp-action="CheckOut" method="post" data-once>
+			<input type="hidden" asp-for="AssetId" /><input type="hidden" asp-for="AssetTag" /><input type="hidden" asp-for="AssetName" />
+			<div asp-validation-summary="ModelOnly" class="alert alert-danger py-2"></div>
+			<div class="mb-3">
+				<label asp-for="EmployeeId" class="form-label"></label>
+				<select id="EmployeeId" asp-for="EmployeeId" class="form-select" asp-items="ViewBag.Employees">
+					<option value="">@L["-- 사용자 선택 --"]</option>
+				</select>
+				<span asp-validation-for="EmployeeId" class="text-danger small"></span>
+			</div>
+			<div class="mb-3">
+				<label asp-for="Notes" class="form-label"></label>
+				<input asp-for="Notes" class="form-control" placeholder="@L["예: 신규 입사자 지급"]" />
+			</div>
+			<button type="submit" class="btn btn-success">@L["불출 처리"]</button>
+			<a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.AssetId">@L["취소"]</a>
+		</form>
+	</div>
+</div>
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+
+			$('#EmployeeId').select2({
+				theme: "bootstrap-5",
+				width: '100%',
+				placeholder: @Json.Serialize(L["-- 사용자 선택 --"].Value),
+				allowClear: true
+			});
+		});
+	</script>
+}

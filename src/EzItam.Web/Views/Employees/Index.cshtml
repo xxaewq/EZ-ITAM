@@ -12,7 +12,8 @@
         <div class="col-md-2 d-flex gap-1"><button class="btn btn-sm btn-primary">@L["검색"]</button><a class="btn btn-sm btn-outline-secondary" asp-action="Index">@L["초기화"]</a></div>
     </form>
 </div></div>
-<div class="card"><table class="table table-sm table-hover mb-0">
+<div class="card">
+    <table id="employeesTable" style="visibility: hidden; width:100%" class="table table-sm table-hover mb-0">
     <thead class="table-light"><tr><th>@L["사번"]</th><th>@L["이름"]</th><th>@L["부서"]</th><th>@L["직급"]</th><th>@L["이메일"]</th><th>@L["재직"]</th><th>@L["사용 자산"]</th></tr></thead>
     <tbody>
     @foreach (var e in Model)
@@ -27,3 +28,17 @@
     @if (Model.Count == 0) { <tr><td colspan="7" class="text-center text-muted py-4">@L["조건에 맞는 사원이 없습니다."]</td></tr> }
     </tbody>
 </table></div>
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#employeesTable').DataTable({
+                "initComplete": function (settings, json) {
+                    // Sau khi DataTable đã khởi tạo xong, đổi lại visibility thành visible
+                    $('#employeesTable').css('visibility', 'visible');
+                }
+                });
+            });
+    </script>
+}

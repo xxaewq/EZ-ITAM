@@ -20,6 +20,7 @@
   "nav.users": "Quản lý người dùng",
   "nav.password": "Mật khẩu",
   "nav.logout": "Đăng xuất",
+  "nav.backgroundjob": "Tác vụ nền",
   "role.admin": "Quản trị viên",
   "role.manager": "Quản lý",
   "role.viewer": "Người xem",
